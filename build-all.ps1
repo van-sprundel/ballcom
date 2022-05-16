@@ -1,38 +1,38 @@
 echo "Building CustomerManagement"
 cd CustomerManagement
-.\build.sh
+.\build.ps1
 
 echo "Building InventoryManagement"
 cd ..\InventoryManagement
-.\build.sh
+.\build.ps1
 
 echo "Building NotificationService"
 cd ..\NotificationService
-.\build.sh
+.\build.ps1
 
 echo "Building OrderManagement"
 cd ..\OrderManagement
-.\build.sh
+.\build.ps1
 
 echo "Building OrderPicker"
 cd ..\Orderpicker
-.\build.sh
+.\build.ps1
 
 echo "Building PaymentService"
 cd ..\PaymentService
-.\build.sh
+.\build.ps1
 
 echo "Building ServiceDesk"
 cd ..\ServiceDesk
-.\build.sh
+.\build.ps1
 
 echo "Building SupplierManagement"
 cd ..\SupplierManagement
-.\build.sh
+.\build.ps1
 
 echo "Building TransportManagement"
 cd ..\TransportManagement
-.\build.sh
+.\build.ps1
 
 cd ..
 echo "Done!"
