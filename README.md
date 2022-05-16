@@ -13,5 +13,5 @@ Om alle containers te maken en bij te werken, voer het build-all script uit (ps1
 Om alle containers te starten, voer `docker-compose up` uit
 
 # RabbitMQ
-Om bij de rabbitMq uit te voeren ga naar http://localhost:15672.
+Om bij de rabbitMq uit te voeren ga naar http://localhost:15672
 Log in met User: Rathalos en Wachtwoord: 1234

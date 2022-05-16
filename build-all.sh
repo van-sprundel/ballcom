@@ -1,42 +1,16 @@
 #!/bin/bash
+echo "Starting..."
 
-echo "Building CustomerManagement"
-cd CustomerManagement
-source ./build.sh
+source ./build.sh CustomerManagement &&
+source ./build.sh InventoryManagement &&
+source ./build.sh NotificationService &&
+source ./build.sh OrderManagement &&
+source ./build.sh OrderPicker && 
+source ./build.sh PaymentService &&
+source ./build.sh ServiceDesk &&
+source ./build.sh SupplierManagement &&
+source ./build.sh TransportManagement
 
-echo "Building InventoryManagement"
-cd ../InventoryManagement
-source ./build.sh
-
-echo "Building NotificationService"
-cd ../NotificationService
-source ./build.sh
-
-echo "Building OrderManagement"
-cd ../OrderManagement
-source ./build.sh
-
-echo "Building OrderPicker"
-cd ../Orderpicker
-source ./build.sh
-
-echo "Building PaymentService"
-cd ../PaymentService
-source ./build.sh
-
-echo "Building ServiceDesk"
-cd ../ServiceDesk
-source ./build.sh
-
-echo "Building SupplierManagement"
-cd ../SupplierManagement
-source ./build.sh
-
-echo "Building TransportManagement"
-cd ../TransportManagement
-source ./build.sh
-
-cd ..
 echo "Done!"
 echo "Building docker containers with docker-compose"
 
