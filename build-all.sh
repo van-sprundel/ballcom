@@ -41,6 +41,10 @@ echo "Done!"
 echo "Building docker containers with docker-compose"
 
 docker volume rm rabbitmqdata
+docker volume rm mariadbdata
+
+docker volume create --name=mariadbdata
 docker volume create --name=rabbitmqdata
+
 
 docker-compose build

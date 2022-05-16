@@ -82,7 +82,35 @@ services:
       - "5672:5672"
     environment:
       - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
+    
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    volumes:
+      - mariadbdata:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: username
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+
+
+    links:
+      - mariadb
 
 volumes:  
   rabbitmqdata:
+    external: true
+  mariadbdata:
     external: true
