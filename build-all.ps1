@@ -37,4 +37,8 @@ cd ..\TransportManagement
 cd ..
 echo "Done!"
 echo "Building docker containers with docker-compose"
+
+docker volume rm rabbitmqdata
+docker volume create --name=rabbitmqdata
+
 docker-compose build
