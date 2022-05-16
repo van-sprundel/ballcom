@@ -1,0 +1,72 @@
+services:
+  customer-management:
+    image: ballcom/customer-management
+    build: CustomerManagement
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_URLS=http://*:5000
+
+  inventory-management:
+    image: ballcom/inventory-management
+    build: InventoryManagement
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_URLS=http://*:5001
+
+  notification-service:
+    image: ballcom/notification-service
+    build: NotificationService
+    ports:
+      - "5002:5002"
+    environment:
+      - ASPNETCORE_URLS=http://*:5002
+
+  order-management:
+    image: ballcom/order-management
+    build: OrderManagement
+    ports:
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_URLS=http://*:5003
+
+  orderpicker:
+    image: ballcom/orderpicker
+    build: Orderpicker
+    ports:
+      - "5004:5004"
+    environment:
+      - ASPNETCORE_URLS=http://*:5004
+  
+  payment-service:
+    image: ballcom/payment-service
+    build: PaymentService
+    ports:
+      - "5005:5005"
+    environment:
+      - ASPNETCORE_URLS=http://*:5005
+
+  service-desk:
+    image: ballcom/service-desk
+    build: ServiceDesk
+    ports:
+      - "5006:5006"
+    environment:
+      - ASPNETCORE_URLS=http://*:5006
+
+  supplier-management:
+    image: ballcom/supplier-management
+    build: SupplierManagement
+    ports:
+      - "5007:5007"
+    environment:
+      - ASPNETCORE_URLS=http://*:5007
+
+  transport-management:
+    image: ballcom/transport-management
+    build: TransportManagement
+    ports:
+      - "5008:5008"
+    environment:
+      - ASPNETCORE_URLS=http://*:5008
