@@ -26,9 +26,29 @@ Om bij de rabbitMq client te komen, ga naar http://localhost:15672/ \
 Log in met user:pass `Rathalos`:`1234`
 
 # phpMyAdmin
-
 Om bij phpMyAdmin te komen, ga naar http://localhost:8080/ \
 Log in met user:pass `root`:`secret`
+
+# Migration CustomerManagment
+- Zorg ervoor dat de MariaDb draaiend is in de container.
+- Open een powershell window
+- Navigeer naar de map customer management
+- Om te controleren of je entity framework heb, voer de volgende command uit.
+```
+dotnet ef
+```
+- als je geen eenhoorn ziet, voer de volgende command uit
+```
+ dotnet tool install --global dotnet-ef
+```
+- Als je zelf een migration wil toevoegen, voer uit
+```
+dotnet migrations add "naam_migration"
+```
+- Wil je de database updaten met de huidige migrations voer dan uit
+```
+dotnet ef database update
+```
 
 # Troubleshoot
 ```
@@ -36,3 +56,6 @@ Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3
 ```
 Dit gebeurt wanneer er nog een process op dezelfde poort luistert, in mijn geval was dat mysqld.exe
 netstat -ano | findstr "0.0.0.0:3306"
+
+
+
