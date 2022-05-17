@@ -54,8 +54,9 @@ dotnet ef database update
 ```
 Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3306 -> 0.0.0.0:0: listen tcp 0.0.0.0:3306: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted 
 ```
-Dit gebeurt wanneer er nog een process op dezelfde poort luistert, in mijn geval was dat mysqld.exe
-netstat -ano | findstr "0.0.0.0:3306"
+Dit gebeurt wanneer er nog een process op dezelfde poort luistert, en kan je zien met `netstat -ano | findstr "0.0.0.0:3306"`\
+In mijn geval was dit mysqld.exe, dus dit proces moet gekillt worden
+
 
 
 
