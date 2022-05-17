@@ -1,7 +1,33 @@
 services:
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+      - "./rabbitmq:/etc/ballcom/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    volumes:
+      - mariadbdata:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: username
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+
   customer-management:
     image: ballcom/customer-management
     build: CustomerManagement
+    depends_on:
+      - mariadb
     ports:
       - "5000:5000"
     environment:
@@ -70,30 +96,6 @@ services:
       - "5008:5008"
     environment:
       - ASPNETCORE_URLS=http://*:5008
-
-  rabbitmq:
-    image: rabbitmq:management-alpine
-    container_name: rabbitmq
-    volumes:
-      - rabbitmqdata:/var/lib/rabbitmq
-      - "./rabbitmq:/etc/ballcom/"
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    environment:
-      - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
-    
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    volumes:
-      - mariadbdata:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_USER: username
-      MYSQL_PASSWORD: secret
-    ports:
-      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin
