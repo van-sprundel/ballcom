@@ -49,7 +49,11 @@ dotnet migrations add naam_migration
 ```
 dotnet ef database update
 ```
-- Doe hetzelfde voor: customerService
+- Doe hetzelfde voor: 
+
+customerService
+
+SupplierManagement
 
 # Troubleshoot
 ```
