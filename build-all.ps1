@@ -1,4 +1,5 @@
 echo "Starting..."
+
 .\build.ps1 CustomerManagement 
 .\build.ps1 InventoryManagement  
 .\build.ps1 NotificationService  
