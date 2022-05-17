@@ -7,8 +7,7 @@ namespace CustomerManagement.DataAccess;
 public class CustomerManagementDbContext : DbContext
 {
 
-    public CustomerManagementDbContext(DbContextOptions<CustomerManagementDbContext> options) :
-        base(options)
+    public CustomerManagementDbContext(DbContextOptions<CustomerManagementDbContext> options) : base(options)
     {
         
     }

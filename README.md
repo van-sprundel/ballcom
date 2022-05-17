@@ -43,12 +43,13 @@ dotnet ef
 ```
 - Als je zelf een migration wil toevoegen, voer uit
 ```
-dotnet migrations add "naam_migration"
+dotnet migrations add naam_migration
 ```
 - Wil je de database updaten met de huidige migrations voer dan uit
 ```
 dotnet ef database update
 ```
+- Doe hetzelfde voor: customerService
 
 # Troubleshoot
 ```
