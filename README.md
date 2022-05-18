@@ -17,8 +17,8 @@ Om alle containers te maken en bij te werken, voer het build-all script uit \
 
 # Gebruik van de containers
 
-Om alle containers te starten, voer `docker-compose up` uit\
-Om alle containers te stoppen, voer `docker-compose kill` uit (vaak niet nodig)
+Om alle containers te starten, voer `docker-compose up -d` uit\
+Om alle containers te stoppen, voer `docker-compose kill` uit
 
 # RabbitMQ
 
@@ -26,14 +26,12 @@ Om bij de rabbitMq client te komen, ga naar http://localhost:15672/ \
 Log in met user:pass `Rathalos`:`1234`
 
 # phpMyAdmin
-Om bij phpMyAdmin te komen, ga naar http://localhost:8080/
+Om bij phpMyAdmin te komen, ga naar http://localhost:8080/ \
 Log in met user:pass `root`:`secret`
 
-# Migration CustomerManagment
+# Update databases
 - Zorg ervoor dat de MariaDb draaiend is in de container.
-- Open een powershell window 
-- Navigeer naar de map customer management
-- Om te controleren of je entity framework heb, voer de volgende command uit.
+- Om te controleren of je entity framework heb, voer de volgende command uit in een powershell window.
 ```
 dotnet ef
 ```
@@ -41,11 +39,26 @@ dotnet ef
 ```
  dotnet tool install --global dotnet-ef
 ```
-- Als je zelf een migration wil toevoegen, voer uit
+- Als je zelf een migration wil toevoegen, voer de volgende command in een powershell window in de folder van het project
 ```
-dotnet migrations add "naam_migration"
+dotnet migrations add naam_migration
 ```
-- Wil je de database updaten met de huidige migrations voer dan uit
+- Wil je een database updaten met de huidige migrations voer de volgende command uit in de folder van het project.
 ```
 dotnet ef database update
 ```
+- Doe hetzelfde voor: 
+
+Wil je alle databases tegelijkertijd updaten, run het script update-databases-all.ps1
+
+# Troubleshoot
+```
+Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3306 -> 0.0.0.0:0: listen tcp 0.0.0.0:3306: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted 
+```
+Dit gebeurt wanneer er nog een process op dezelfde poort luistert,\
+en kan je zien met `netstat -ano | findstr "0.0.0.0:3306"`\
+In mijn geval was dit mysqld.exe, dus dit proces moet gekillt worden
+
+
+
+
