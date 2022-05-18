@@ -10,6 +10,8 @@ services:
       - "5672:5672"
     environment:
       - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
+    networks:
+      - rabbitmq_net
 
   mariadb:
     image: mariadb
@@ -33,6 +35,8 @@ services:
       - "5000:5000"
     environment:
       - ASPNETCORE_URLS=http://*:5000
+    networks:
+      - rabbitmq_net
 
   inventory-management:
     image: ballcom/inventory-management
@@ -117,3 +121,7 @@ volumes:
     external: true
   mariadbdata:
     external: true
+    
+networks:
+  rabbitmq_net:
+      driver: bridge

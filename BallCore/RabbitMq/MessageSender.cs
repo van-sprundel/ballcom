@@ -5,60 +5,41 @@ namespace BallCore.RabbitMq;
 
 public class MessageSender : IMessageSender, IDisposable
 {
-    private IConnection? _connection;
-    private IModel? _channel;
-    private readonly List<string> _queues;
+    private readonly IConnection? _connection;
+    private readonly IModel? _channel;
 
-    public MessageSender()
+    public MessageSender(params string[] queues)
     {
-        Console.WriteLine("Creating RabbitMq service");
-        _queues = new List<string>();
-        _queues.AddRange(new[]{ "general" });
-        Start().Wait();
-    }
+        Console.WriteLine("Creating and starting RabbitMq service");
 
-    public Task Start()
-    {
-        Console.WriteLine("Starting RabbitMq service");
-
-        return Task.Run(() =>
+        var factory = new ConnectionFactory
         {
-            var factory = new ConnectionFactory
-            {
-                HostName = "localhost",
-                UserName = "Rathalos",
-                Password = "1234",
-                Port = 5672,
-                DispatchConsumersAsync = true
-            };
-
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            foreach (var queueName in _queues)
-            {
-                _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-            }
-        });
-    }
-
-    public Task Stop()
-    {
-        Console.WriteLine("Stopping RabbitMq service");
+            HostName = "rabbitmq",
+            Port = 5672,
+            UserName = "Rathalos",
+            Password = "1234",
+            DispatchConsumersAsync = true
+        };
         
-        return Task.Run(() =>
-        {
-            _channel?.Dispose();
-            _connection?.Dispose();
-        });
+
+        _connection = factory.CreateConnection();
+        _channel = _connection.CreateModel();
+        foreach (var queueName in queues)
+            _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
     }
 
     public void Send(string channelName, object message)
     {
-        _channel.BasicPublish(exchange: "", routingKey: channelName, basicProperties: null, body: JsonSerializer.SerializeToUtf8Bytes(message));
+        var props = _channel!.CreateBasicProperties();
+        props.ContentType = "application/json";
+        
+        _channel.BasicPublish(exchange: "", routingKey: channelName, basicProperties: props, body: JsonSerializer.SerializeToUtf8Bytes(message));
     }
     
     public void Dispose()
     {
-        Stop().Wait();
+        Console.WriteLine("Stopping RabbitMq service");
+        _channel?.Dispose();
+        _connection?.Dispose();
     }
 }

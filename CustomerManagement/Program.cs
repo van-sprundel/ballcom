@@ -10,7 +10,7 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
-builder.Services.AddSingleton<IMessageSender, MessageSender>();
+builder.Services.AddSingleton<IMessageSender>(new MessageSender("general"));
 
 var app = builder.Build();
 
