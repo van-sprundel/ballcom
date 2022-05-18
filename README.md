@@ -17,7 +17,7 @@ Om alle containers te maken en bij te werken, voer het build-all script uit \
 
 # Gebruik van de containers
 
-Om alle containers te starten, voer `docker-compose up` uit\
+Om alle containers te starten, voer `docker-compose up -d` uit\
 Om alle containers te stoppen, voer `docker-compose kill` uit (vaak niet nodig)
 
 # RabbitMQ
