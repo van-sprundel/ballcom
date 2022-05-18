@@ -698,4 +698,8 @@
       <_ContentIncludedByDefault Remove="out\SupplierManagement.runtimeconfig.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BallCore\BallCore.csproj" />
+    </ItemGroup>
+
 </Project>
