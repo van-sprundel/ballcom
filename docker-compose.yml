@@ -10,8 +10,6 @@ services:
       - "5672:5672"
     environment:
       - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
-    networks:
-      - rabbitmq_net
 
   mariadb:
     image: mariadb
@@ -35,8 +33,6 @@ services:
       - "5000:5000"
     environment:
       - ASPNETCORE_URLS=http://*:5000
-    networks:
-      - rabbitmq_net
 
   inventory-management:
     image: ballcom/inventory-management
@@ -47,8 +43,6 @@ services:
       - "5001:5001"
     environment:
       - ASPNETCORE_URLS=http://*:5001
-    networks:
-      - rabbitmq_net
 
   notification-service:
     image: ballcom/notification-service
@@ -57,8 +51,6 @@ services:
       - "5002:5002"
     environment:
       - ASPNETCORE_URLS=http://*:5002
-    networks:
-      - rabbitmq_net
 
   order-management:
     image: ballcom/order-management
@@ -69,8 +61,6 @@ services:
       - "5003:5003"
     environment:
       - ASPNETCORE_URLS=http://*:5003
-    networks:
-      - rabbitmq_net
 
   orderpicker:
     image: ballcom/orderpicker
@@ -81,8 +71,6 @@ services:
       - "5004:5004"
     environment:
       - ASPNETCORE_URLS=http://*:5004
-    networks:
-      - rabbitmq_net
   
   payment-service:
     image: ballcom/payment-service
@@ -93,8 +81,6 @@ services:
       - "5005:5005"
     environment:
       - ASPNETCORE_URLS=http://*:5005
-    networks:
-      - rabbitmq_net
 
   service-desk:
     image: ballcom/service-desk
@@ -105,8 +91,6 @@ services:
       - "5006:5006"
     environment:
       - ASPNETCORE_URLS=http://*:5006
-    networks:
-      - rabbitmq_net
 
   supplier-management:
     image: ballcom/supplier-management
@@ -117,8 +101,6 @@ services:
       - "5007:5007"
     environment:
       - ASPNETCORE_URLS=http://*:5007
-    networks:
-      - rabbitmq_net
 
   transport-management:
     image: ballcom/transport-management
@@ -129,8 +111,6 @@ services:
       - "5008:5008"
     environment:
       - ASPNETCORE_URLS=http://*:5008
-    networks:
-      - rabbitmq_net
 
   phpmyadmin:
     image: phpmyadmin
@@ -149,7 +129,3 @@ volumes:
     external: true
   mariadbdata:
     external: true
-    
-networks:
-  rabbitmq_net:
-      driver: bridge
