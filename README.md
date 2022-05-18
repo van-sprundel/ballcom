@@ -29,11 +29,9 @@ Log in met user:pass `Rathalos`:`1234`
 Om bij phpMyAdmin te komen, ga naar http://localhost:8080/ \
 Log in met user:pass `root`:`secret`
 
-# Migration CustomerManagment
+# Update databases
 - Zorg ervoor dat de MariaDb draaiend is in de container.
-- Open een powershell window
-- Navigeer naar de map customer management
-- Om te controleren of je entity framework heb, voer de volgende command uit.
+- Om te controleren of je entity framework heb, voer de volgende command uit in een powershell window.
 ```
 dotnet ef
 ```
@@ -41,29 +39,17 @@ dotnet ef
 ```
  dotnet tool install --global dotnet-ef
 ```
-- Als je zelf een migration wil toevoegen, voer uit
+- Als je zelf een migration wil toevoegen, voer de volgende command in een powershell window in de folder van het project
 ```
 dotnet migrations add naam_migration
 ```
-- Wil je de database updaten met de huidige migrations voer dan uit
+- Wil je een database updaten met de huidige migrations voer de volgende command uit in de folder van het project.
 ```
 dotnet ef database update
 ```
 - Doe hetzelfde voor: 
 
-customerService
-
-SupplierManagement
-
-InventoryManagement
-
-Orderpicker
-
-OrderManagement
-
-PaymentService
-
-TransportManagement
+Wil je alle databases tegelijkertijd updaten, run het script update-databases-all.ps1
 
 # Troubleshoot
 ```
