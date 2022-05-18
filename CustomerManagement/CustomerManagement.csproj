@@ -14,6 +14,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+      <PackageReference Include="RabbitMQ.Client" Version="6.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -695,6 +696,10 @@
       <_ContentIncludedByDefault Remove="out\ServiceDesk.runtimeconfig.json" />
       <_ContentIncludedByDefault Remove="out\SupplierManagement.deps.json" />
       <_ContentIncludedByDefault Remove="out\SupplierManagement.runtimeconfig.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BallCore\BallCore.csproj" />
     </ItemGroup>
 
 </Project>
