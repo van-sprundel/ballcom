@@ -270,4 +270,8 @@
       <_ContentIncludedByDefault Remove="out\out\TransportManagement.runtimeconfig.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BallCore\BallCore.csproj" />
+    </ItemGroup>
+
 </Project>

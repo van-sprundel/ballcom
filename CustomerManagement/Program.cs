@@ -1,7 +1,7 @@
+using System.Text.Json;
+using BallCore.RabbitMq;
 using CustomerManagement.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Pomelo.EntityFrameworkCore.MySql.Internal;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,11 +10,22 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+builder.Services.AddSingleton<IMessageSender, MessageSender>();
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World from customermanagement!");
-
-
+app.MapGet("/send", (IMessageSender rmq) =>
+{
+    var message = new
+    {
+        Msg = "Hello world",
+        Time = DateTime.Now.ToLongTimeString()
+    };
+    
+    rmq.Send("general", message);
+    return Results.Ok($"Sent message: {JsonSerializer.Serialize(message)}");
+});
 
 Console.WriteLine("Starting application");
 app.Run();
