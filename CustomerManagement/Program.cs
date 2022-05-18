@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BallCore.RabbitMq;
+using CustomerManagement;
 using CustomerManagement.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+builder.Services.AddHostedService<CustomerMessageReceiver>();
 builder.Services.AddSingleton<IMessageSender>(new MessageSender("general"));
 
 var app = builder.Build();
@@ -24,6 +26,7 @@ app.MapGet("/send", (IMessageSender rmq) =>
     };
     
     rmq.Send("general", message);
+    Console.WriteLine("Sending message");
     return Results.Ok($"Sent message: {JsonSerializer.Serialize(message)}");
 });
 
