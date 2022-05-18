@@ -41,6 +41,8 @@ services:
   inventory-management:
     image: ballcom/inventory-management
     build: InventoryManagement
+    depends_on:
+      - mariadb
     ports:
       - "5001:5001"
     environment:
@@ -57,6 +59,8 @@ services:
   order-management:
     image: ballcom/order-management
     build: OrderManagement
+    depends_on:
+      - mariadb
     ports:
       - "5003:5003"
     environment:
@@ -65,6 +69,8 @@ services:
   orderpicker:
     image: ballcom/orderpicker
     build: Orderpicker
+    depends_on:
+      - mariadb
     ports:
       - "5004:5004"
     environment:
@@ -73,6 +79,8 @@ services:
   payment-service:
     image: ballcom/payment-service
     build: PaymentService
+    depends_on:
+      - mariadb
     ports:
       - "5005:5005"
     environment:
@@ -81,6 +89,8 @@ services:
   service-desk:
     image: ballcom/service-desk
     build: ServiceDesk
+    depends_on:
+      - mariadb
     ports:
       - "5006:5006"
     environment:
@@ -89,6 +99,8 @@ services:
   supplier-management:
     image: ballcom/supplier-management
     build: SupplierManagement
+    depends_on:
+      - mariadb
     ports:
       - "5007:5007"
     environment:
@@ -97,6 +109,8 @@ services:
   transport-management:
     image: ballcom/transport-management
     build: TransportManagement
+    depends_on:
+      - mariadb
     ports:
       - "5008:5008"
     environment:
