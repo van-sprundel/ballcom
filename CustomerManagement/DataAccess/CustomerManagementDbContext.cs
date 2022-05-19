@@ -1,4 +1,4 @@
-﻿using CustomerManagement.Models;
+﻿using BallCore.Model;
 using Microsoft.EntityFrameworkCore;
 
 

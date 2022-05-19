@@ -1,5 +1,5 @@
-﻿using CustomerManagement.DataAccess;
-using CustomerManagement.Models;
+﻿using BallCore.Model;
+using CustomerManagement.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +19,7 @@ public class CustomersController : Controller
     [Route("test", Name = "Test")]
     public async Task<IActionResult> Test()
     {
-        return Ok("test");
+        return await Task.FromResult(Ok("test"));
     }
 
     [HttpGet]
@@ -68,5 +68,4 @@ public class CustomersController : Controller
             throw;
         }
     }
-
 }

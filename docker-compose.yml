@@ -13,9 +13,9 @@ services:
     networks:
       - rabbitmq_net
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
-      interval: 30s
-      timeout: 10s
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 20s
       retries: 5
 
   mariadb:
@@ -35,8 +35,10 @@ services:
     build: CustomerManagement
     restart: on-failure
     depends_on:
-      - rabbitmq
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5000:5000"
     environment:
@@ -48,7 +50,10 @@ services:
     image: ballcom/inventory-management
     build: InventoryManagement
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5001:5001"
     environment:
@@ -59,6 +64,11 @@ services:
   notification-service:
     image: ballcom/notification-service
     build: NotificationService
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5002:5002"
     environment:
@@ -70,7 +80,10 @@ services:
     image: ballcom/order-management
     build: OrderManagement
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5003:5003"
     environment:
@@ -82,7 +95,10 @@ services:
     image: ballcom/orderpicker
     build: Orderpicker
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5004:5004"
     environment:
@@ -94,7 +110,10 @@ services:
     image: ballcom/payment-service
     build: PaymentService
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5005:5005"
     environment:
@@ -106,7 +125,10 @@ services:
     image: ballcom/service-desk
     build: ServiceDesk
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5006:5006"
     environment:
@@ -118,7 +140,10 @@ services:
     image: ballcom/supplier-management
     build: SupplierManagement
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5007:5007"
     environment:
@@ -130,7 +155,10 @@ services:
     image: ballcom/transport-management
     build: TransportManagement
     depends_on:
-      - mariadb
+      rabbitmq:
+        condition: service_healthy
+      maria:
+        condition: service_started
     ports:
       - "5008:5008"
     environment:
@@ -150,12 +178,14 @@ services:
     links:
       - mariadb
 
-volumes:  
+volumes:
   rabbitmqdata:
     external: true
   mariadbdata:
     external: true
-    
+
 networks:
   rabbitmq_net:
-      driver: bridge
+    driver: bridge
+
+  

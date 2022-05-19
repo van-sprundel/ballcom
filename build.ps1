@@ -5,10 +5,10 @@ echo $msg
 $out_path = $path+'/out'
 
 if (-not(Test-Path -Path $out_path)) {
-    mkdir out
+    mkdir $out_path
 } else {
     echo "Emptying /out"
     Remove-Item -path $out_path/* -r
 }
 
-dotnet publish $path -c Release -r linux-musl-x64 --self-contained true -o $out_path
+.\build-dotnet.ps1 $path

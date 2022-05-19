@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BallCore.Model;
 using BallCore.RabbitMq;
 using CustomerManagement;
 using CustomerManagement.DataAccess;
@@ -38,15 +39,19 @@ app.MapControllers();
 app.MapGet("/", () => "Hello World from customermanagement!!!!!");
 app.MapGet("/send", (IMessageSender rmq) =>
 {
-    var message = new
+    var customer = new Customer()
     {
-        Msg = "Hello world",
-        Time = DateTime.Now.ToLongTimeString()
+        CustomerId = -1,
+        Email = "email@gmail.com",
+        Address = "address",
+        City = "city",
+        FirstName = "FirstName",
+        LastNmae = "LastName"
     };
-    
-    rmq.Send("general", message);
+
+    rmq.Send("general", customer);
     Console.WriteLine("Sending message");
-    return Results.Ok($"Sent message: {JsonSerializer.Serialize(message)}");
+    return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");
 });
 
 Console.WriteLine("Starting application");
