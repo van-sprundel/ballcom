@@ -7,7 +7,7 @@ $out_path = $path+'/out'
 if (-not(Test-Path -Path $out_path)) {
     mkdir out
 } else {
-    echo "Emptying out path"
+    echo "Emptying /out"
     Remove-Item -path $out_path/* -r
 }
 

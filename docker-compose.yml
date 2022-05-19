@@ -12,6 +12,11 @@ services:
       - RABBITMQ_CONFIG_FILE=/etc/ballcom/rabbitmq.conf
     networks:
       - rabbitmq_net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   mariadb:
     image: mariadb
@@ -28,9 +33,10 @@ services:
   customer-management:
     image: ballcom/customer-management
     build: CustomerManagement
+    restart: on-failure
     depends_on:
-      - mariadb
       - rabbitmq
+      - mariadb
     ports:
       - "5000:5000"
     environment:
