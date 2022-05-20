@@ -20,4 +20,12 @@ public class SupplierController : Controller
     {
         return Ok(await _dbContext.Suppliers.ToListAsync());
     }
+
+    [HttpGet]
+    [Route("{supplierId}", Name = "GetBySupplierId")]
+    public async Task<IActionResult> GetBySupplierId(int supplierId)
+    {
+        var supplier = await _dbContext.Suppliers.FirstOrDefaultAsync(c => c.SupplierId == supplierId);
+        if (supplier != null) { return Ok(customer); }
+    }
 }
