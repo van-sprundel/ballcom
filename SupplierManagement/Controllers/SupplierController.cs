@@ -28,4 +28,25 @@ public class SupplierController : Controller
         var supplier = await _dbContext.Suppliers.FirstOrDefaultAsync(c => c.SupplierId == supplierId);
         if (supplier != null) { return Ok(customer); }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> AddSupplierAsync(Supplier supplier)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                _dbContext.Suppliers.Add(customer);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return BadRequest();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes. ");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+            throw;
+        }
+    }
 }
