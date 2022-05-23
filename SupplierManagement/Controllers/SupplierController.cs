@@ -1,9 +1,10 @@
-using SupplierManagement.DataAccess;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SupplierManagement.DataAccess;
 using SupplierManagement.Models;
 
-namespace CustomerManagement.Controllers;
+namespace SupplierManagement.Controllers;
 
 [Route("/api/[controller]")]
 public class SupplierController : Controller

@@ -10,8 +10,8 @@ using SupplierManagement.DataAccess;
 namespace SupplierManagement.Migrations
 {
     [DbContext(typeof(SupplierManagementDbContext))]
-    [Migration("20220517144931_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220523191228_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

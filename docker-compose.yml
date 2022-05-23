@@ -149,6 +149,9 @@ services:
   phpmyadmin:
     image: phpmyadmin
     container_name: phpmyadmin
+    depends_on:
+      mariadb:
+        condition: service_started
     ports:
       - "8080:80"
     environment:

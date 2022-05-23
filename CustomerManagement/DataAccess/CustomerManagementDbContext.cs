@@ -1,7 +1,6 @@
 ﻿using CustomerManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace CustomerManagement.DataAccess;
     public class CustomerManagementDbContext : DbContext
     {
