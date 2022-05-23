@@ -13,5 +13,5 @@ public class Order
     public List<Product> Products;
     
     public int customerId { get; set; }
-    public Customer Customer { get; set; }
+    //public Customer Customer { get; set; }
 }
