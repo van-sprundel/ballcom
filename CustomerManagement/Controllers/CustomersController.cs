@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CustomerManagement.Controllers
-{
+namespace CustomerManagement.Controllers;
     [Route("/api/[controller]")]
     public class CustomersController : Controller
     {

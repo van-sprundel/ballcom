@@ -2,8 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 
-namespace CustomerManagement.DataAccess
-{
+namespace CustomerManagement.DataAccess;
     public class CustomerManagementDbContext : DbContext
     {
 
@@ -24,4 +23,3 @@ namespace CustomerManagement.DataAccess
 
 
     }
-}
