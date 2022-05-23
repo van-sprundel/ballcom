@@ -11,7 +11,6 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
 //Inject receivers
-builder.Services.AddHostedService<CustomerMessageReceiver>();
 builder.Services.AddHostedService<OrderMessageReceiver>();
 
 //Inject sender
