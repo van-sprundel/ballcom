@@ -26,7 +26,7 @@ public class DomainEvent : IEvent
     public string Name => $"{Payload.GetType().Name}.{Type.ToString()}";
 
     /// <inheritdoc cref="IEvent.Serialize"/>
-    public byte[] Serialize() => JsonSerializer.SerializeToUtf8Bytes(Payload);
+    public byte[] Serialize() => JsonSerializer.SerializeToUtf8Bytes(Payload, Payload.GetType());
 
     /// <summary>
     /// Create new DomainEvent
