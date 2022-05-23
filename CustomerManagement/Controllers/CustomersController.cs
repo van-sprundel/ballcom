@@ -38,7 +38,6 @@ public class CustomersController : Controller
         {
             return NotFound();
         }
-
         return Ok(customer);
     }
 

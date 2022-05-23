@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrderManagement.DataAccess;
 
@@ -10,9 +11,10 @@ using OrderManagement.DataAccess;
 namespace OrderManagement.Migrations
 {
     [DbContext(typeof(OrderManagementDbContext))]
-    partial class OrderManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220523160547_hoofdletters_veranderd")]
+    partial class hoofdletters_veranderd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,6 +62,9 @@ namespace OrderManagement.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("StatusProcess")
                         .HasColumnType("int");
 
@@ -67,28 +72,9 @@ namespace OrderManagement.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("OrderManagement.Models.OrderProduct", b =>
-                {
-                    b.Property<int>("OrderProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderProductId");
-
-                    b.HasIndex("OrderId");
-
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderProduct");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("OrderManagement.Models.Product", b =>
@@ -120,36 +106,16 @@ namespace OrderManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("OrderManagement.Models.Product", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId");
+
                     b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("OrderManagement.Models.OrderProduct", b =>
-                {
-                    b.HasOne("OrderManagement.Models.Order", "Order")
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OrderManagement.Models.Product", "Product")
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("OrderManagement.Models.Order", b =>
-                {
-                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("OrderManagement.Models.Product", b =>
                 {
-                    b.Navigation("OrderProducts");
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

@@ -8,10 +8,10 @@ public class Order
     public DateTime OrderDate { get; set; }
     public StatusProcess StatusProcess { get; set; }
     public double Price { get; set; }
-    public bool isPaid { get; set; }
+    public bool IsPaid { get; set; }
 
-    public List<Product> Products;
+    public ICollection<OrderProduct> OrderProducts { get; set; }
     
-    public int customerId { get; set; }
+    public int CustomerId { get; set; }
     public Customer Customer { get; set; }
 }

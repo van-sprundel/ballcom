@@ -8,8 +8,25 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+// Add framework services
+builder.Services
+    .AddMvc(options => options.EnableEndpointRouting = false);
+
+// setup MVC
+builder.Services.AddControllers();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseMvc();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.MapControllers();
 
 app.MapGet("/", () => "Hello World from ordermanagement!");
 

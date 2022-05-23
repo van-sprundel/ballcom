@@ -41,7 +41,7 @@ dotnet ef
 ```
 - Als je zelf een migration wil toevoegen, voer de volgende command in een powershell window in de folder van het project
 ```
-dotnet migrations add naam_migration
+dotnet ef migrations add naam_migration
 ```
 - Wil je een database updaten met de huidige migrations voer de volgende command uit in de folder van het project.
 ```
