@@ -1,4 +1,4 @@
-﻿using BallCore.Model;
+﻿using CustomerManagement.Models;
 using CustomerManagement.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

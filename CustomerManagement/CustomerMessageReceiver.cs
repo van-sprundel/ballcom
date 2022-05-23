@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using BallCore.Model;
 using BallCore.RabbitMq;
+using CustomerManagement.Models;
 
 namespace CustomerManagement;
 

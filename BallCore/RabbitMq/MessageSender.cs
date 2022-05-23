@@ -20,22 +20,23 @@ public class MessageSender : IMessageSender, IDisposable
             Password = "1234",
             DispatchConsumersAsync = true
         };
-        
 
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
         foreach (var queueName in queues)
-            _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false,
+                arguments: null);
     }
 
     public void Send(string channelName, object message)
     {
         var props = _channel!.CreateBasicProperties();
         props.ContentType = "application/json";
-        
-        _channel.BasicPublish(exchange: "", routingKey: channelName, basicProperties: props, body: JsonSerializer.SerializeToUtf8Bytes(message));
+
+        _channel.BasicPublish(exchange: "", routingKey: channelName, basicProperties: props,
+            body: JsonSerializer.SerializeToUtf8Bytes(message));
     }
-    
+
     public void Dispose()
     {
         Console.WriteLine("Stopping RabbitMq service");

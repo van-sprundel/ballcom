@@ -3,7 +3,7 @@
 public enum StatusProcess
 {
     Pending,
-    Collecting,
+    Collecting, // paid
     Underway,
     Arrived
 }

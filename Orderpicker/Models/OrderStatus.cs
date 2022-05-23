@@ -2,6 +2,8 @@
 
 public enum OrderStatus
 {
-    Collecting,
-    Underway
+    Pending,
+    Collecting, // paid
+    Underway,
+    Arrived
 }

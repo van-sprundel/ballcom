@@ -20,5 +20,6 @@ docker volume rm mariadbdata
 docker volume create --name=mariadbdata
 docker volume create --name=rabbitmqdata
 
+echo "Building docker-compose"
 
 docker-compose build

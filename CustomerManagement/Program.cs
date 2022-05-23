@@ -1,8 +1,8 @@
 using System.Text.Json;
-using BallCore.Model;
 using BallCore.RabbitMq;
 using CustomerManagement;
 using CustomerManagement.DataAccess;
+using CustomerManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -46,7 +46,7 @@ app.MapGet("/send", (IMessageSender rmq) =>
         Address = "address",
         City = "city",
         FirstName = "FirstName",
-        LastNmae = "LastName"
+        LastName = "LastName"
     };
 
     rmq.Send("general", customer);
