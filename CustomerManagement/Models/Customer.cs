@@ -1,6 +1,8 @@
-﻿namespace CustomerManagement.Models;
+﻿using BallCore;
 
-public class Customer
+namespace CustomerManagement.Models;
+
+public class Customer : IDomainModel
 {
     public int CustomerId { get; set; }
     public string? FirstName { get; set; }

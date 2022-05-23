@@ -1,4 +1,5 @@
 using System.Text.Json;
+using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement;
 using CustomerManagement.DataAccess;
@@ -13,8 +14,11 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+//Inject receiver
 builder.Services.AddHostedService<CustomerMessageReceiver>();
-builder.Services.AddSingleton<IMessageSender>(new MessageSender("general"));
+
+//Inject sender
+builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
 // Add framework services
 builder.Services
@@ -39,7 +43,7 @@ app.MapControllers();
 app.MapGet("/", () => "Hello World from customermanagement!!!!!");
 app.MapGet("/send", (IMessageSender rmq) =>
 {
-    var customer = new Customer()
+    var customer = new Customer
     {
         CustomerId = -1,
         Email = "email@gmail.com",
@@ -49,7 +53,9 @@ app.MapGet("/send", (IMessageSender rmq) =>
         LastName = "LastName"
     };
 
-    rmq.Send("general", customer);
+    //Send domain event to broker
+    rmq.Send(new DomainEvent(customer, EventType.Created, "general"));
+    
     Console.WriteLine("Sending message");
     return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");
 });

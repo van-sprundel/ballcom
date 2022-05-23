@@ -23,7 +23,7 @@ public class DomainEvent : IEvent
     /// <summary>
     /// The event name (like CustomerCreated) but seperated with dot to ease parsing (Customer.Created)
     /// </summary>
-    public string Name => $"{Type.GetType().Name}.{Type}";
+    public string Name => $"{Payload.GetType().Name}.{Type.ToString()}";
 
     /// <inheritdoc cref="IEvent.Serialize"/>
     public byte[] Serialize() => JsonSerializer.SerializeToUtf8Bytes(Payload);
