@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using BallCore.Events;
 using Microsoft.Extensions.Hosting;
