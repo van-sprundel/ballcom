@@ -64,11 +64,10 @@ public abstract class MessageReceiver : IHostedService
                     // CustomerCreated => Customer.Created => payload = Customer, type = EventType.Created
                     var typeOfPayload = ea.BasicProperties.Type.Split('.')[0];
                     var typeOfEvent = ea.BasicProperties.Type.Split('.')[1];
-                
+                    
                     //Find specified type with reflection => "Customer" => CustomerManagement.Customer or InventoryManagement.Customer etc
-                    var type = Assembly.GetExecutingAssembly().GetTypes()
+                    var type = Assembly.GetEntryAssembly().GetTypes()
                         .FirstOrDefault(x => x.IsClass && 
-                                             x.Namespace == GetType().Namespace && 
                                              x.IsAssignableTo(typeof(IDomainModel)) &&
                                              x.Name == typeOfPayload);
                     if (type == null)
@@ -82,10 +81,8 @@ public abstract class MessageReceiver : IHostedService
                         //1. Deserialize body to object of expected type
                         var obj = (IDomainModel) JsonSerializer.Deserialize(ea.Body.ToArray(), type);
                     
-                        //2. Create Event object and send to channel
-                        var res = await HandleMessage(new DomainEvent(obj, eventType, ea.RoutingKey));
-                        if(res)
-                            _channel.BasicAck(ea.DeliveryTag, false);
+                        //2. Create Event object and call handler
+                        await HandleMessage(new DomainEvent(obj, eventType, ea.RoutingKey));
                     }
                     else
                     {
@@ -96,11 +93,10 @@ public abstract class MessageReceiver : IHostedService
                 else
                 {
                     //Not a domain event
-                    var res = await HandleMessage(new RawEvent(ea.RoutingKey, ea.BasicProperties.Type, ea.Body.ToArray()));
-                    if(res)
-                        _channel.BasicAck(ea.DeliveryTag, false);
+                    await HandleMessage(new RawEvent(ea.RoutingKey, ea.BasicProperties.Type, ea.Body.ToArray()));
                 }
 
+                _channel.BasicAck(ea.DeliveryTag, false);
                 await Task.Yield();
             };
 
@@ -119,7 +115,7 @@ public abstract class MessageReceiver : IHostedService
     /// </summary>
     /// <param name="e">The event that is received</param>
     /// <returns>True if ACK must be sent</returns>
-    protected abstract Task<bool> HandleMessage(IEvent e);
+    protected abstract Task HandleMessage(IEvent e);
 
     /// <summary>
     /// Stop the service and disconnect
