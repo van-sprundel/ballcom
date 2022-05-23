@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using BallCore.Model;
 using CustomerManagement.DataAccess;
 using CustomerManagement.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OrderManagement.Models;
-using Customer = BallCore.Model.Customer;
 
 namespace CustomerManagement.Controllers
 {
@@ -33,6 +30,18 @@ namespace CustomerManagement.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             Console.WriteLine("called");
+
+            var customers = await _dbContext.Set<Customer>().Select(
+                x => new CustomerViewModel
+                {
+                    City = x.City,
+                    Address = x.Address,
+                    Email = x.Email,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName
+                }).ToListAsync();
+
+
             return Ok(await _dbContext.Customers.ToListAsync());
         }
 
@@ -51,7 +60,11 @@ namespace CustomerManagement.Controllers
 
             return this.Ok(new CustomerViewModel
             {
-                Email = customer.Email
+                Email = customer.Email,
+                Address = customer.Address,
+                City = customer.City,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName
             });
         }
 
@@ -64,14 +77,18 @@ namespace CustomerManagement.Controllers
                 {
                     var customer = new Customer
                     {
-                        Email = form.Email
+                        Email = form.Email,
+                        FirstName = form.FirstName,
+                        LastName = form.LastName,
+                        Address = form.Address,
+                        City = form.City
                     };
 
                     // insert customer
                     _dbContext.Customers.Add(customer);
                     await _dbContext.SaveChangesAsync();
 
-                    //TODO: sent event
+                    //TODO: send event
 
                     // return result
                     return CreatedAtRoute("GetByCustomerId", new { customerId = customer.CustomerId }, customer);
