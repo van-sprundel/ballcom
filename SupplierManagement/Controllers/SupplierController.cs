@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SupplierManagement.Models;
 
-namespace CustomerManagement.Controllers;
+namespace SupplierManagement.Controllers;
 
 [Route("/api/[controller]")]
 public class SupplierController : Controller
@@ -37,12 +37,17 @@ public class SupplierController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddSupplierAsync(Supplier supplier)
+    public async Task<IActionResult> AddSupplierAsync([FromBody] CreateSupplierViewModel form)
     {
         try
         {
             if (ModelState.IsValid)
             {
+                var supplier = new Supplier
+                {
+                    Name = form.Name,
+                    Email = form.Email
+                };
                 _dbContext.Suppliers.Add(supplier);
                 await _dbContext.SaveChangesAsync();
             }
