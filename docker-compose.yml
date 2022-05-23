@@ -37,7 +37,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5000:5000"
@@ -52,7 +52,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5001:5001"
@@ -67,7 +67,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5002:5002"
@@ -82,7 +82,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5003:5003"
@@ -97,7 +97,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5004:5004"
@@ -112,7 +112,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5005:5005"
@@ -127,7 +127,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5006:5006"
@@ -142,7 +142,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5007:5007"
@@ -157,7 +157,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      maria:
+      mariadb:
         condition: service_started
     ports:
       - "5008:5008"
