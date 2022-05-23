@@ -4,9 +4,9 @@ using PaymentService.Models;
 
 namespace PaymentService;
 
-public class OrderMessageReceiver : MessageReceiver
+public class PaymentMessageReceiver : MessageReceiver
 {
-    public OrderMessageReceiver() : base(new[] { "general", "testnet" })
+    public PaymentMessageReceiver() : base(new[] { "general", "testnet", "payment"  })
     {
     }
 
@@ -16,7 +16,6 @@ public class OrderMessageReceiver : MessageReceiver
         Console.WriteLine("Received message");
         switch (e)
         {
-            //Pattern matching: if event is domain event with customer
             case DomainEvent {Payload: Order order} de:
             {
                 Console.WriteLine($"Received {de.Type} message {order.OrderId} : {order.isPaid}");

@@ -11,8 +11,8 @@ using OrderManagement.DataAccess;
 namespace OrderManagement.Migrations
 {
     [DbContext(typeof(OrderManagementDbContext))]
-    [Migration("20220517155725_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220523190849_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,21 +20,6 @@ namespace OrderManagement.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("OrderManagement.Models.Customer", b =>
-                {
-                    b.Property<int>("CustomerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("CustomerId");
-
-                    b.ToTable("Customers");
-                });
 
             modelBuilder.Entity("OrderManagement.Models.Order", b =>
                 {
@@ -72,8 +57,6 @@ namespace OrderManagement.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("customerId");
-
                     b.ToTable("Orders");
                 });
 
@@ -103,14 +86,6 @@ namespace OrderManagement.Migrations
                     b.HasOne("OrderManagement.Models.Product", null)
                         .WithMany("Orders")
                         .HasForeignKey("ProductId");
-
-                    b.HasOne("OrderManagement.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("customerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("OrderManagement.Models.Product", b =>

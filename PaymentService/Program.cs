@@ -2,17 +2,21 @@ using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using PaymentService;
 using PaymentService.DataAccess;
+using PaymentService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // add DBContext
 var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDbConnectionString");
 builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
-    options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
+    options.UseMySql(
+        mariaDbConnectionString,
+        ServerVersion.AutoDetect(mariaDbConnectionString)
+    )
+);
 
 //Inject receivers
-builder.Services.AddHostedService<OrderMessageReceiver>();
-
+builder.Services.AddHostedService<PaymentMessageReceiver>();
 //Inject sender
 builder.Services.AddSingleton<IMessageSender, MessageSender>();
 
@@ -22,6 +26,7 @@ builder.Services
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

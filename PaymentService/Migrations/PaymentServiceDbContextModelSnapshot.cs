@@ -28,6 +28,10 @@ namespace PaymentService.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("longtext");

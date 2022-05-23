@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BallCore.Events;
+using BallCore.RabbitMq;
+using Microsoft.AspNetCore.Mvc;
 using PaymentService.DataAccess;
 
 namespace PaymentService.Controllers;
@@ -6,10 +8,12 @@ namespace PaymentService.Controllers;
 public class PaymentController : Controller
 {
     private readonly PaymentServiceDbContext _dbContext;
+    private readonly IMessageSender _rmq;
 
-    public PaymentController(PaymentServiceDbContext dbContext)
+    public PaymentController(IMessageSender rmq,PaymentServiceDbContext dbContext)
     {
         _dbContext = dbContext;
+        _rmq = rmq;
     }
 
     [HttpGet]
@@ -26,8 +30,28 @@ public class PaymentController : Controller
         var order = await _dbContext.Orders.FindAsync(orderId);
         if (order == null)
         {
-            return await Task.FromResult(new NotFoundResult());
+            return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
         }
+        return await Task.FromResult(Ok(order));
+    }
+    
+    [HttpPost]
+    [Route("api/order/{orderId}")]
+    public async Task<IActionResult> PayOrder(int orderId)
+    {
+        var order = await _dbContext.Orders.FindAsync(orderId);
+        if (order == null)
+        {
+            return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
+        }
+
+        order.isPaid = true;
+        _dbContext.Orders.Update(order);
+        await _dbContext.SaveChangesAsync();
+
+        //Send domain event to broker
+        _rmq.Send(new DomainEvent(order, EventType.Updated, "general"));
+        
         return await Task.FromResult(Ok(order));
     }
 }
