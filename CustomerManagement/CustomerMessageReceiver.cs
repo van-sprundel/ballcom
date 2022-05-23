@@ -2,8 +2,7 @@ using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement.Models;
 
-namespace CustomerManagement
-{
+namespace CustomerManagement;
 
 public class CustomerMessageReceiver : MessageReceiver
 {
