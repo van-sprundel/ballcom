@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CustomerManagement.DataAccess;
 using CustomerManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,6 @@ namespace CustomerManagement.Controllers;
                     LastName = x.LastName
                 }).ToListAsync();
 
-
             return Ok(await _dbContext.Customers.ToListAsync());
         }
 
@@ -67,7 +67,9 @@ namespace CustomerManagement.Controllers;
             });
         }
 
+        [AllowAnonymous]
         [HttpPost]
+        [Route("add")]
         public async Task<IActionResult> RegisterAsync([FromBody] CreateCustomerViewModel form)
         {
             try
