@@ -1,5 +1,4 @@
 using System.Text.Json;
-using BallCore.Model;
 using BallCore.RabbitMq;
 using CustomerManagement;
 using CustomerManagement.DataAccess;
