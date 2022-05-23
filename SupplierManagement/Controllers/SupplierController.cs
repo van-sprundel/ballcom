@@ -16,24 +16,37 @@ public class SupplierController : Controller
     }
 
     [HttpGet]
+    [Route("test", Name = "Test")]
+    public async Task<IActionResult> Test()
+    {
+        return await Task.FromResult(Ok("test"));
+    }
+    [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
         return Ok(await _dbContext.Suppliers.ToListAsync());
     }
 
+
     [HttpGet]
     [Route("{supplierId}", Name = "GetBySupplierId")]
-    public async Task<IActionResult> GetBySupplierId(int supplierId)
+    public async Task<IActionResult> GetAsync(int id)
     {
-        var supplier = await _dbContext.Suppliers.FirstOrDefaultAsync(c => c.SupplierId == supplierId);
-        if (supplier != null)
+        var supplier = await _dbContext
+            .Set<Supplier>()
+            .FirstOrDefaultAsync(c => c.SupplierId == supplierId);
+
+        if (supplier == null)
         {
-            return Ok(supplier);
+            return NotFound();
         }
-        else
+
+        return this.Ok(new SupplierViewModel
         {
-            return NotFound("Supplier not found");
-        }
+            SupplierId = supplier.SupplierId,
+            Name = supplier.Name,
+            Email = supplier.Email
+        });
     }
 
     [HttpPost]
