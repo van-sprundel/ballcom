@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BallCore.Model;
 using BallCore.RabbitMq;
+using CustomerManagement.Models;
 
 namespace CustomerManagement
 {

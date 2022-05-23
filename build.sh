@@ -1,5 +1,4 @@
 #!/bin/bash
-
 MSG="Building "$1
 echo "$MSG"
 
@@ -8,4 +7,4 @@ if [ ! -d "$1"/out ];then
 fi
 
 rm -r "$1"/out
-source .\build-dotnet.sh $1 
+source ./build-dotnet.sh $1 

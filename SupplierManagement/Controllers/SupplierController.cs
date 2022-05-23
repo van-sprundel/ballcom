@@ -1,7 +1,7 @@
-using BallCore.Model;
 using SupplierManagement.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SupplierManagement.Models;
 
 namespace CustomerManagement.Controllers;
 
@@ -26,7 +26,14 @@ public class SupplierController : Controller
     public async Task<IActionResult> GetBySupplierId(int supplierId)
     {
         var supplier = await _dbContext.Suppliers.FirstOrDefaultAsync(c => c.SupplierId == supplierId);
-        if (supplier != null) { return Ok(customer); }
+        if (supplier != null)
+        {
+            return Ok(supplier);
+        }
+        else
+        {
+            return NotFound("Supplier not found");
+        }
     }
 
     [HttpPost]
@@ -36,7 +43,7 @@ public class SupplierController : Controller
         {
             if (ModelState.IsValid)
             {
-                _dbContext.Suppliers.Add(customer);
+                _dbContext.Suppliers.Add(supplier);
                 await _dbContext.SaveChangesAsync();
             }
 
