@@ -63,7 +63,6 @@ public class OrderController : Controller
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
             }
-
             return BadRequest();
         }
         catch (DbUpdateException)
