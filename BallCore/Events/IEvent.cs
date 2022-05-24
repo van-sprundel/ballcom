@@ -14,7 +14,7 @@ public interface IEvent
     public string Destination { get; }
     
     /// <summary>
-    /// Whether to use exhange or queue
+    /// Whether to use exchange or queue
     /// </summary>
     [JsonIgnore]
     public bool UseExchange { get; }

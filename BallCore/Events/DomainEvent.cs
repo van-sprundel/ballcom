@@ -17,8 +17,10 @@ public class DomainEvent : IEvent
     /// </summary>
     public IDomainModel Payload { get; }
     
-
+    /// <inheritdoc cref="IEvent.Destination"/>
     public string Destination { get; }
+    
+    /// <inheritdoc cref="IEvent.UseExchange"/>
     public bool UseExchange { get; }
 
     /// <summary>
@@ -36,7 +38,7 @@ public class DomainEvent : IEvent
     /// <param name="type">The event type</param>
     /// <param name="destination">The destination the event must be received from</param>
     /// <param name="useExchange">whether the destination is an exchange or channel</param>
-    public DomainEvent(IDomainModel payload, EventType type, string destination, bool useExchange)
+    public DomainEvent(IDomainModel payload, EventType type, string destination, bool useExchange = false)
     {
         Type = type;
         Destination = destination;

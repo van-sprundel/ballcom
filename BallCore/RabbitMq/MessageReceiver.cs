@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using BallCore.Events;
 using Microsoft.Extensions.Hosting;
@@ -14,22 +13,20 @@ namespace BallCore.RabbitMq;
 /// </summary>
 public abstract class MessageReceiver : IHostedService
 {
-    private readonly string _exchange;
     private IConnection? _connection;
     private IModel? _channel;
     private AsyncEventingBasicConsumer? _consumer;
-
-    public readonly string[] _queues;
+    private readonly string[] _queues;
+    private readonly string[] _exchanges;
 
     /// <summary>
     /// Specify which queues you want to subscribe to
     /// </summary>
     /// <param name="queues">The queues to bind to the exchange</param>
-    /// <param name="exchange">The exchange to send messages to</param>
-    protected MessageReceiver(string[] queues, string exchange)
+    protected MessageReceiver(IEnumerable<string> queues, IEnumerable<string> exchanges)
     {
-        _queues = queues;
-        _exchange = exchange;
+        _queues = queues.ToArray();
+        _exchanges = exchanges.ToArray();
     }
 
     /// <summary>
@@ -55,15 +52,14 @@ public abstract class MessageReceiver : IHostedService
 
             //Create channel within connection. Note: a connection can contain multiple channels, but we use a connection per message receiver instance
             _channel = _connection.CreateModel();
-
-            //Declare queues/exchanges (create if not exist)
-            _channel.ExchangeDeclare(_exchange, "fanout", durable: true, autoDelete: false);
-            // foreach (var queueName in _queues)
-            // {
-            //     _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false,
-            //         arguments: null);
-            //     _channel.QueueBind(queueName, _exchange, "");
-            // }
+            
+            //Declare queues
+            foreach (var q in _queues)
+                _channel.QueueDeclare(queue: q, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            
+            //Declare exchanges
+            foreach (var e in _exchanges)
+                _channel.ExchangeDeclare(e, "fanout", durable: true, autoDelete: false);
 
             _consumer = new AsyncEventingBasicConsumer(_channel);
             _consumer.Received += Consumer_Received;
@@ -71,8 +67,6 @@ public abstract class MessageReceiver : IHostedService
             //Start consuming from queues
             foreach (var queue in _queues)
             {
-                _channel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false,
-                    arguments: null);
                 var consumerTag = _channel.BasicConsume(queue, true, _consumer);
                 Console.WriteLine($"Consumer #{consumerTag} for {queue}");
             }
@@ -103,15 +97,12 @@ public abstract class MessageReceiver : IHostedService
             {
                 //1. Deserialize body to object of expected type
                 var obj = (IDomainModel)JsonSerializer.Deserialize(ea.Body.ToArray(), type)!;
+
+                var isExchange = !string.IsNullOrEmpty(ea.Exchange);
+                
                 //2. Create Event object and call handler
-                if (string.IsNullOrEmpty(ea.Exchange))
-                {
-                    await HandleMessage(new DomainEvent(obj, eventType,  ea.RoutingKey,false));
-                }
-                else
-                {
-                    await HandleMessage(new DomainEvent(obj, eventType,  ea.Exchange,true));
-                }
+                await HandleMessage(new DomainEvent(obj, eventType, isExchange ? ea.Exchange : ea.RoutingKey,
+                    isExchange));
             }
             else
             {
@@ -122,18 +113,12 @@ public abstract class MessageReceiver : IHostedService
         else
         {
             //Not a domain event
-            if (string.IsNullOrEmpty(ea.Exchange))
-            {
-                await HandleMessage(new RawEvent( ea.BasicProperties.Type, ea.Body.ToArray(),ea.RoutingKey, false));
-            }
-            else
-            {
-                await HandleMessage(new RawEvent( ea.BasicProperties.Type, ea.Body.ToArray(),ea.Exchange, true));
-            }
+            var isExchange = !string.IsNullOrEmpty(ea.Exchange);
+            await HandleMessage(new RawEvent(ea.Body.Span, ea.BasicProperties.Type, isExchange ? ea.Exchange : ea.RoutingKey, isExchange));
         }
 
         await Task.Yield();
-        // _channel!.BasicAck(ea.DeliveryTag, false);
+        // _channel!.BasicAck(ea.DeliveryTag, false); //TODO: (when) do we need this? This says: i consumed it, remove it from queue
     }
 
     /// <summary>
