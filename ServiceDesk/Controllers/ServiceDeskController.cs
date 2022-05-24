@@ -67,7 +67,7 @@ namespace ServiceDesk.Controllers;
 
         [HttpPost]
         [Route("create")]
-        public async Task<IActionResult> Create([FromBody] TicketCreateViewModel form)
+        public async Task<IActionResult> Create([FromBody] TicketCreateForm form)
         {
             try
             {
@@ -95,6 +95,46 @@ namespace ServiceDesk.Controllers;
                 }
 
                 return BadRequest();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Unable to save changes. ");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [Route("update")]
+        public async Task<IActionResult> Update([FromBody] TicketUpdateForm form)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var ticket = await this._dbContext
+                    .Set<Ticket>()
+                    .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
+
+                    if (ticket == null) {
+                        return this.NotFound();
+                    }
+                    
+                    ticket.Status = form.Status;
+
+                    _dbContext
+                    .Set<Ticket>()
+                    .Update(ticket);
+                    
+                    await _dbContext.SaveChangesAsync();
+
+                    //TODO: send event
+
+                    // return result
+                    return this.CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
+                }
+
+                return this.BadRequest();
             }
             catch (DbUpdateException)
             {

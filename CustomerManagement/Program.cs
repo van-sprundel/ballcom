@@ -40,25 +40,8 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
-app.MapGet("/", () => "Hello World from customermanagement!!!!!");
-app.MapGet("/send", (IMessageSender rmq) =>
-{
-    var customer = new Customer
-    {
-        CustomerId = -1,
-        Email = "email@gmail.com",
-        Address = "address",
-        City = "city",
-        FirstName = "FirstName",
-        LastName = "LastName"
-    };
+app.MapGet("/", () => "Hello World suppliermanagement!");
 
-    //Send domain event to broker
-    rmq.Send(new DomainEvent(customer, EventType.Created, "general"));
-    
-    Console.WriteLine("Sending message");
-    return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");
-});
 
 Console.WriteLine("Starting application");
 app.Run();

@@ -1,6 +1,6 @@
 namespace ServiceDesk.Models;
 
-public class TicketCreateViewModel
+public class TicketCreateForm
 {
     public int TicketId { get; set; }
     public string TicketText { get; set; }
