@@ -1,9 +1,9 @@
-﻿namespace OrderManagement.Models;
+﻿namespace BallCore.Enums;
 
 public enum StatusProcess
 {
     Pending,
-    Collecting, // paid
+    Collecting,
     Underway,
     Arrived
 }

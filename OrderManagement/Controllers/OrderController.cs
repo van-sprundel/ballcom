@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BallCore.Enums;
+using BallCore.Events;
+using BallCore.RabbitMq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
@@ -10,10 +13,12 @@ namespace OrderManagement.Controllers;
 public class OrderController : Controller
 {
     private readonly OrderManagementDbContext _dbContext;
+    private readonly IMessageSender _rmq;
 
-    public OrderController(OrderManagementDbContext dbContext)
+    public OrderController(OrderManagementDbContext dbContext, IMessageSender rmq)
     {
         _dbContext = dbContext;
+        _rmq = rmq;
     }
     
     [HttpGet]
@@ -58,7 +63,20 @@ public class OrderController : Controller
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
 
-                //TODO: send event???
+                //PURE TESTING
+                // Order order2 = new Order
+                // {
+                //     CustomerId = form.CustomerId,
+                //     ArrivalCity = "TESTING",
+                //     ArrivalAdress = "TESTING",
+                //     OrderDate = DateTime.Now,
+                //     StatusProcess = StatusProcess.Pending,
+                //     Price = 900,
+                //     IsPaid = false,
+                //     OrderProducts = new List<OrderProduct>()
+                // };
+                //
+                // _rmq.Send(new DomainEvent(order2, EventType.Created, "order", false));
 
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
@@ -90,6 +108,10 @@ public class OrderController : Controller
                     {
                         return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
                     }
+                    if (product.Quantity < 1)
+                    {
+                        return StatusCode(StatusCodes.Status410Gone, "Order is out of stock");
+                    }
                     OrderProduct orderProduct = new OrderProduct 
                     { 
                         OrderId = orderNumber,
@@ -100,9 +122,7 @@ public class OrderController : Controller
                     _dbContext.OrderProduct.Add(orderProduct);
                     _dbContext.Orders.Update(order);
                     await _dbContext.SaveChangesAsync();
-            
-                    // TODO: send event???
-            
+
                     // return result
                     return Ok();
                 }
@@ -151,7 +171,8 @@ public class OrderController : Controller
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();
             
-            // TODO: send event??
+            // Send event
+            _rmq.Send(new DomainEvent(order, EventType.Created, "order", false));
 
             return StatusCode(StatusCodes.Status200OK, order);
         }
@@ -184,8 +205,6 @@ public class OrderController : Controller
                 _dbContext.Orders.Update(order);
                 await _dbContext.SaveChangesAsync();
 
-                // TODO: send event???
-            
                 // return result
                 return StatusCode(StatusCodes.Status204NoContent);
             }
