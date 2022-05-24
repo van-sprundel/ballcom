@@ -18,13 +18,6 @@ namespace ServiceDesk.Controllers;
         }
 
         [HttpGet]
-        [Route("test", Name = "Test")]
-        public async Task<IActionResult> Test()
-        {
-            return await Task.FromResult(Ok("test"));
-        }
-
-        [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
             var tickets = await _dbContext.Set<Ticket>()
@@ -121,6 +114,9 @@ namespace ServiceDesk.Controllers;
                     }
                     
                     ticket.Status = form.Status;
+
+                    // Check if ticket is solved
+                    if(ticket.Status == 2)
 
                     _dbContext
                     .Set<Ticket>()
