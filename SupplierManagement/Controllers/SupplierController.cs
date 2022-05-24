@@ -30,7 +30,7 @@ public class SupplierController : Controller
             {
                 Name = form.Name,
                 Email = form.Email,
-                Products = new List<Product>()
+                Products = form.Products
             }).ToListAsync();
 
         return Ok(await _dbContext.Suppliers.ToListAsync());
@@ -47,14 +47,14 @@ public class SupplierController : Controller
 
         if (supplier == null)
         {
-            return NotFound();
+            return NotFound("Can't find supplier");
         }
 
         return this.Ok(new SupplierViewModel
         {
-            SupplierId = supplier.SupplierId,
             Name = supplier.Name,
             Email = supplier.Email,
+            Products = form.Products
         });
     }
 
