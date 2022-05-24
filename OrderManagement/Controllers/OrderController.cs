@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
@@ -10,7 +9,7 @@ namespace OrderManagement.Controllers;
 [Route("/api/[controller]")]
 public class OrderController : Controller
 {
-    OrderManagementDbContext _dbContext;
+    private readonly OrderManagementDbContext _dbContext;
 
     public OrderController(OrderManagementDbContext dbContext)
     {
@@ -32,6 +31,8 @@ public class OrderController : Controller
         {
             return NotFound();
         }
+
+        order.OrderProducts = _dbContext.OrderProduct.Where(op => op.OrderId == orderId).ToList();
         return Ok(order);
     }
 
@@ -42,7 +43,6 @@ public class OrderController : Controller
         {
             if (ModelState.IsValid)
             {
-                
                 Order order = new Order
                 {
                     CustomerId = form.CustomerId,
@@ -51,7 +51,8 @@ public class OrderController : Controller
                     OrderDate = DateTime.Now,
                     StatusProcess = StatusProcess.Pending,
                     Price = 0,
-                    IsPaid = false
+                    IsPaid = false,
+                    OrderProducts = new List<OrderProduct>()
                 };
                 // insert order
                 _dbContext.Orders.Add(order);
@@ -69,7 +70,6 @@ public class OrderController : Controller
         {
             ModelState.AddModelError("", "Unable to save changes. ");
             return StatusCode(StatusCodes.Status500InternalServerError);
-            throw;
         }
     }
 
@@ -79,28 +79,40 @@ public class OrderController : Controller
     {
         try
         {
-            int amountProducts = _dbContext.OrderProduct
-                .Select(op => op.OrderId == orderNumber && op.ProductId == productNumber).Count();
+            int amountProducts =  _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
             if (amountProducts < 20)
             {
-                OrderProduct orderProduct = new OrderProduct 
-                { 
-                    OrderId = orderNumber,
-                    ProductId = productNumber
-                };
-                // Insert
-
-                _dbContext.OrderProduct.Add(orderProduct);
-                await _dbContext.SaveChangesAsync();
+                var order =  await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
+                var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
+                if (product != null && order != null)
+                {
+                    if (order.StatusProcess != StatusProcess.Pending)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+                    }
+                    OrderProduct orderProduct = new OrderProduct 
+                    { 
+                        OrderId = orderNumber,
+                        ProductId = productNumber
+                    };
+                    order.Price += product.Price;
+                    // Insert
+                    _dbContext.OrderProduct.Add(orderProduct);
+                    _dbContext.Orders.Update(order);
+                    await _dbContext.SaveChangesAsync();
             
-                // TODO: send event???
+                    // TODO: send event???
             
-                // return result
-                return Ok();
+                    // return result
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "ProductNumber or OrderNumber could not be found.");
+                } 
             }
             else
             {
-                ModelState.AddModelError("", "This order already contains 20 products, more are not allowed.");
                 return StatusCode(StatusCodes.Status412PreconditionFailed, "This order already contains 20 products, more are not allowed.");
 
             }
@@ -113,18 +125,63 @@ public class OrderController : Controller
         }
     }
 
+    [HttpPut]
+    [Route("submit/{orderNumber}", Name = "SubmitOrder")]
+    public async Task<IActionResult> SubmitOrderAsync(int orderNumber)
+    {
+        try
+        {
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
+            if (order == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Order was not found.");
+            }
+            if (order.StatusProcess != StatusProcess.Pending)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+            }
+            
+            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
+            if (amountProducts < 1)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Order needs at least one product");
+            }
+
+            order.StatusProcess = StatusProcess.Collecting;
+            _dbContext.Orders.Update(order);
+            await _dbContext.SaveChangesAsync();
+            
+            // TODO: send event??
+
+            return StatusCode(StatusCodes.Status200OK, order);
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
     [HttpDelete]
-    [Route("{orderNumber}/{productNumber}", Name = "AddProductToOrder")]
+    [Route("{orderNumber}/{productNumber}", Name = "RemoveProductFromOrder")]
     public async Task<IActionResult> RemoveProductFromOrderAsync(int orderNumber, int productNumber)
     {
         try
         {
-            var orderProduct = _dbContext.OrderProduct.FirstOrDefault(op =>
+            var orderProduct = await _dbContext.OrderProduct.FirstOrDefaultAsync(op =>
                     op.OrderId == orderNumber && op.ProductId == productNumber);
+            var order =  await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
+            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
             // Remove
-            if (orderProduct != null)
+            if (orderProduct != null && order != null && product != null)
             {
+                if (order.StatusProcess != StatusProcess.Pending)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+                }
+                order.Price -= product.Price;
                 _dbContext.OrderProduct.Remove(orderProduct);
+                _dbContext.Orders.Update(order);
                 await _dbContext.SaveChangesAsync();
 
                 // TODO: send event???
@@ -134,7 +191,6 @@ public class OrderController : Controller
             }
             else
             {
-                ModelState.AddModelError("", "Item does not exist.");
                 return StatusCode(StatusCodes.Status404NotFound, "Item does not exist.");
             }
         }

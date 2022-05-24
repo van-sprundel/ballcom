@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.DataAccess;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // add DBContext
@@ -13,7 +14,8 @@ builder.Services
     .AddMvc(options => options.EnableEndpointRouting = false);
 
 // setup MVC
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 var app = builder.Build();
 
