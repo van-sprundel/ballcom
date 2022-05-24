@@ -45,10 +45,10 @@ namespace ServiceDesk.Controllers;
                 
             if (ticket == null)
             {
-                return NotFound();
+                return NotFound("Couldn't find ticket");
             }
 
-            return this.Ok(new TicketViewModel
+            return Ok(new TicketViewModel
             {
                 TicketId = ticket.TicketId,
                 TicketText = ticket.TicketText,
@@ -68,13 +68,13 @@ namespace ServiceDesk.Controllers;
                 
             if (ticket == null)
             {
-                return NotFound();
+                return NotFound("Couldn't find ticket");
             }
 
-            this._dbContext.Set<Ticket>().Remove(ticket);
+            _dbContext.Set<Ticket>().Remove(ticket);
             await _dbContext.SaveChangesAsync();
 
-            return this.Ok();
+            return Ok();
         }
 
         [HttpPost]
@@ -102,13 +102,13 @@ namespace ServiceDesk.Controllers;
                     //TODO: send event
 
                     // return result
-                    return this.Ok(new TicketViewModel 
+                    return Ok(new TicketViewModel
                     {
                         TicketId = ticket.TicketId,
                         TicketText = ticket.TicketText,
                         Status = ticket.Status,
                         CustomerId = ticket.CustomerId
-                    })
+                    });
                 }
 
                 return BadRequest();
@@ -129,18 +129,18 @@ namespace ServiceDesk.Controllers;
             {
                 if (ModelState.IsValid)
                 {
-                    var ticket = await this._dbContext
+                    var ticket = await _dbContext
                     .Set<Ticket>()
                     .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
 
                     if (ticket == null) {
-                        return this.NotFound();
+                        return NotFound("Couldn't find ticket");
                     }
                     
                     ticket.Status = form.Status;
 
                     // Check if ticket is solved
-                    if(ticket.Status == 2) {
+                    if(ticket.Status == Status.Solved) {
                         //Send message to customer
                     }
 
@@ -153,10 +153,10 @@ namespace ServiceDesk.Controllers;
                     //TODO: send event
 
                     // return result
-                    return this.CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
+                    return CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
                 }
 
-                return this.BadRequest();
+                return BadRequest();
             }
             catch (DbUpdateException)
             {
