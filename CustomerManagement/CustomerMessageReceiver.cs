@@ -1,12 +1,13 @@
 using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement.Models;
+using RabbitMQ.Client;
 
 namespace CustomerManagement;
 
 public class CustomerMessageReceiver : MessageReceiver
 {
-    public CustomerMessageReceiver() : base(new[] { "general", "testnet" })
+    public CustomerMessageReceiver(IConnection connection) : base(connection, new[] {"customer", "general"})
     {
     }
 
@@ -14,13 +15,21 @@ public class CustomerMessageReceiver : MessageReceiver
     protected override Task HandleMessage(IEvent e)
     {
         Console.WriteLine("Received message");
-        switch (e)
+
+        if (e is DomainEvent de)
         {
-            //Pattern matching: if event is domain event with customer
-            case DomainEvent {Payload: Customer c} de:
+            switch (de.Payload)
             {
-                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Channel}{de} : {c.FirstName}");
-                break;
+                case Customer c:
+                {
+                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.FirstName}");
+                    break;
+                }
+                case Order o:
+                {
+                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {o.IsPaid}");
+                    break;
+                }
             }
         }
         

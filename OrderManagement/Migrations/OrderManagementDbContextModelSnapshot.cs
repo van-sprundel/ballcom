@@ -48,31 +48,47 @@ namespace OrderManagement.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("StatusProcess")
                         .HasColumnType("int");
 
-                    b.Property<int>("customerId")
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("OrderManagement.Models.OrderProduct", b =>
+                {
+                    b.Property<int>("OrderProductId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("isPaid")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
 
-                    b.HasKey("OrderId");
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderProductId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("customerId");
-
-                    b.ToTable("Orders");
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("OrderManagement.Models.Product", b =>
@@ -98,22 +114,47 @@ namespace OrderManagement.Migrations
 
             modelBuilder.Entity("OrderManagement.Models.Order", b =>
                 {
-                    b.HasOne("OrderManagement.Models.Product", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("ProductId");
-
                     b.HasOne("OrderManagement.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("customerId")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("OrderManagement.Models.Product", b =>
+            modelBuilder.Entity("OrderManagement.Models.OrderProduct", b =>
+                {
+                    b.HasOne("OrderManagement.Models.Order", "Order")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OrderManagement.Models.Product", "Product")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("OrderManagement.Models.Customer", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("OrderManagement.Models.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
+                });
+
+            modelBuilder.Entity("OrderManagement.Models.Product", b =>
+                {
+                    b.Navigation("OrderProducts");
                 });
 #pragma warning restore 612, 618
         }

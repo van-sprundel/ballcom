@@ -1,8 +1,8 @@
 $path = $args[0]
-$msg = "Building " + $path
-
-echo $msg
 $out_path = $path+'/out'
+
+$msg = "Building " + $out_path
+echo $msg
 
 if (-not(Test-Path -Path $out_path)) {
     mkdir $out_path
@@ -12,3 +12,5 @@ if (-not(Test-Path -Path $out_path)) {
 }
 
 .\build-dotnet.ps1 $path
+
+Write-Host "Done!" -ForegroundColor Green
