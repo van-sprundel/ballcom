@@ -1,12 +1,13 @@
 using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement.Models;
+using OrderManagement.Models;
 
 namespace CustomerManagement;
 
 public class CustomerMessageReceiver : MessageReceiver
 {
-    public CustomerMessageReceiver() : base(new[] { "general", "testnet"})
+    public CustomerMessageReceiver() : base(new[] {"customer"},"customer_exchange")
     {
     }
 
@@ -16,10 +17,14 @@ public class CustomerMessageReceiver : MessageReceiver
         Console.WriteLine("Received message");
         switch (e)
         {
-            //Pattern matching: if event is domain event with customer
             case DomainEvent {Payload: Customer c} de:
             {
-                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Channel}{de} : {c.FirstName}");
+                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Exchange}{de} : {c.FirstName}");
+                break;
+            }
+            default:
+            {
+                Console.WriteLine("lol");
                 break;
             }
         }

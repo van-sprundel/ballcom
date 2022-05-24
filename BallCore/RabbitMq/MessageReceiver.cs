@@ -14,20 +14,24 @@ namespace BallCore.RabbitMq;
 /// </summary>
 public abstract class MessageReceiver : IHostedService
 {
-    private readonly string[] _queues;
+    private readonly string _exchange;
     private IConnection? _connection;
     private IModel? _channel;
     private AsyncEventingBasicConsumer? _consumer;
 
+    public readonly string[] _queues;
+
     /// <summary>
     /// Specify which queues you want to subscribe to
     /// </summary>
-    /// <param name="queues">The queues to subscribe to</param>
-    protected MessageReceiver(string[] queues)
+    /// <param name="queues">The queues to bind to the exchange</param>
+    /// <param name="exchange">The exchange to send messages to</param>
+    protected MessageReceiver(string[] queues, string exchange)
     {
         _queues = queues;
+        _exchange = exchange;
     }
-    
+
     /// <summary>
     /// Start the receiver (automatically done by ASP when injected with AddHostedService)
     /// </summary>
@@ -48,67 +52,75 @@ public abstract class MessageReceiver : IHostedService
 
             //Create connection with broker
             _connection = factory.CreateConnection();
-            
+
             //Create channel within connection. Note: a connection can contain multiple channels, but we use a connection per message receiver instance
             _channel = _connection.CreateModel();
-            
-            //Declare queues (create if not exist)
-            foreach (var queueName in _queues)
-                _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
-            
+
+            //Declare queues/exchanges (create if not exist)
+            _channel.ExchangeDeclare(_exchange, "fanout", durable: true, autoDelete: false);
+            // foreach (var queueName in _queues)
+            // {
+            //     _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false,
+            //         arguments: null);
+            //     _channel.QueueBind(queueName, _exchange, "");
+            // }
+
             _consumer = new AsyncEventingBasicConsumer(_channel);
-            _consumer.Received += async (_, ea) =>
-            {
-                //Check if event is domain event (contains .)
-                if (ea.BasicProperties.Type.Contains("."))
-                {
-                    // CustomerCreated => Customer.Created => payload = Customer, type = EventType.Created
-                    var typeOfPayload = ea.BasicProperties.Type.Split('.')[0];
-                    var typeOfEvent = ea.BasicProperties.Type.Split('.')[1];
-                    
-                    //Find specified type with reflection => "Customer" => CustomerManagement.Customer or InventoryManagement.Customer etc
-                    var type = Assembly.GetEntryAssembly().GetTypes()
-                        .FirstOrDefault(x => x.IsClass && 
-                                             x.IsAssignableTo(typeof(IDomainModel)) &&
-                                             x.Name == typeOfPayload);
-                    if (type == null)
-                    {
-                        await Console.Error.WriteLineAsync($"Model type {typeOfPayload} not found");
-                        return;
-                    }
-
-                    if (Enum.TryParse(typeOfEvent, true, out EventType eventType))
-                    {
-                        //1. Deserialize body to object of expected type
-                        var obj = (IDomainModel) JsonSerializer.Deserialize(ea.Body.ToArray(), type);
-                    
-                        //2. Create Event object and call handler
-                        await HandleMessage(new DomainEvent(obj, eventType, ea.RoutingKey));
-                    }
-                    else
-                    {
-                        await Console.Error.WriteLineAsync($"Event type {typeOfEvent} does not exist");
-                        return;
-                    }
-                }
-                else
-                {
-                    //Not a domain event
-                    await HandleMessage(new RawEvent(ea.RoutingKey, ea.BasicProperties.Type, ea.Body.ToArray()));
-                }
-
-                _channel.BasicAck(ea.DeliveryTag, false);
-                await Task.Yield();
-            };
+            _consumer.Received += Consumer_Received;
 
             //Start consuming from queues
-            foreach (var queueName in _queues)
+            foreach (var queue in _queues)
             {
-                var consumerTag = _channel.BasicConsume(queueName, false, _consumer);
-                Console.WriteLine($"Consumer #{consumerTag} for {queueName}");
+                _channel.QueueDeclare(queue: queue, durable: true, exclusive: false, autoDelete: false,
+                    arguments: null);
+                var consumerTag = _channel.BasicConsume(queue, true, _consumer);
+                Console.WriteLine($"Consumer #{consumerTag} for {queue}");
+            }
+        }, cancellationToken);
+    }
+
+    private async Task Consumer_Received(object sender, BasicDeliverEventArgs ea)
+    {
+        //Check if event is domain event (contains .)
+        if (ea.BasicProperties.Type.Contains("."))
+        {
+            // CustomerCreated => Customer.Created => payload = Customer, type = EventType.Created
+            var typeOfPayload = ea.BasicProperties.Type.Split('.')[0];
+            var typeOfEvent = ea.BasicProperties.Type.Split('.')[1];
+
+            //Find specified type with reflection => "Customer" => CustomerManagement.Customer or InventoryManagement.Customer etc
+            var type = Assembly.GetEntryAssembly()!.GetTypes()
+                .FirstOrDefault(x => x.IsClass &&
+                                     x.IsAssignableTo(typeof(IDomainModel)) &&
+                                     x.Name == typeOfPayload);
+            if (type == null)
+            {
+                await Console.Error.WriteLineAsync($"Model type {typeOfPayload} not found");
+                return;
             }
 
-        }, cancellationToken);
+            if (Enum.TryParse(typeOfEvent, true, out EventType eventType))
+            {
+                //1. Deserialize body to object of expected type
+                var obj = (IDomainModel)JsonSerializer.Deserialize(ea.Body.ToArray(), type)!;
+                //2. Create Event object and call handler
+                await HandleMessage(new DomainEvent(obj, eventType, "", ea.Exchange));
+            }
+            else
+            {
+                await Console.Error.WriteLineAsync($"Event type {typeOfEvent} does not exist");
+                return;
+            }
+        }
+        else
+        {
+            //Not a domain event
+            await HandleMessage(new RawEvent(ea.RoutingKey, ea.Exchange, ea.BasicProperties.Type,
+                ea.Body.ToArray()));
+        }
+
+        await Task.Yield();
+        // _channel!.BasicAck(ea.DeliveryTag, false);
     }
 
     /// <summary>

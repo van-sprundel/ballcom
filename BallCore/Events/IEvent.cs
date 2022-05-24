@@ -8,7 +8,13 @@ namespace BallCore.Events;
 public interface IEvent
 {
     /// <summary>
-    /// The channel the event must be send to/is received from
+    /// The exchange the event must be send to
+    /// </summary>
+    [JsonIgnore]
+    public string Exchange { get; }
+    
+    /// <summary>
+    /// The channel the event must be send to
     /// </summary>
     [JsonIgnore]
     public string Channel { get; }

@@ -12,3 +12,5 @@ if (-not(Test-Path -Path $out_path)) {
 }
 
 .\build-dotnet.ps1 $path
+
+Write-Host "Done!" -ForegroundColor Green

@@ -8,7 +8,7 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
-
+    
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World from ordermanagement!");

@@ -18,7 +18,7 @@ builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
 builder.Services.AddHostedService<CustomerMessageReceiver>();
 
 //Inject sender
-builder.Services.AddSingleton<IMessageSender, MessageSender>();
+builder.Services.AddTransient<IMessageSender>(_ => new MessageSender(new [] {"payment"},"payment_exchange"));
 
 // Add framework services
 builder.Services
@@ -54,7 +54,7 @@ app.MapGet("/send", (IMessageSender rmq) =>
     };
 
     //Send domain event to broker
-    rmq.Send(new DomainEvent(customer, EventType.Created, "general"));
+    rmq.Send(new DomainEvent(customer, EventType.Created, "","customer_exchange"));
     
     Console.WriteLine("Sending message");
     return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");

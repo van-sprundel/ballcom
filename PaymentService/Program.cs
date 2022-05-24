@@ -18,7 +18,7 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
 //Inject receivers
 builder.Services.AddHostedService<PaymentMessageReceiver>();
 //Inject sender
-builder.Services.AddSingleton<IMessageSender, MessageSender>();
+builder.Services.AddTransient<IMessageSender>(_ => new MessageSender(new [] {"payment","customer"},"payment_exchange"));
 
 builder.Services
     .AddMvc(options => options.EnableEndpointRouting = false);
@@ -26,7 +26,6 @@ builder.Services
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

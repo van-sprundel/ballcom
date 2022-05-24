@@ -6,7 +6,7 @@ namespace PaymentService;
 
 public class PaymentMessageReceiver : MessageReceiver
 {
-    public PaymentMessageReceiver() : base(new[] { "general", "testnet", "payment"  })
+    public PaymentMessageReceiver() : base(new[] {"payment"},"payment_exchange")
     {
     }
 
@@ -19,6 +19,11 @@ public class PaymentMessageReceiver : MessageReceiver
             case DomainEvent {Payload: Order order} de:
             {
                 Console.WriteLine($"Received {de.Type} message {order.OrderId} : {order.isPaid}");
+                break;
+            }
+            default:
+            {
+                Console.WriteLine("lol");
                 break;
             }
         }
