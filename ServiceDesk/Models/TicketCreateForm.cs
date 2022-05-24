@@ -2,7 +2,6 @@ namespace ServiceDesk.Models;
 
 public class TicketCreateForm
 {
-    public int TicketId { get; set; }
     public string TicketText { get; set; }
     public Status  Status { get; set; }
     

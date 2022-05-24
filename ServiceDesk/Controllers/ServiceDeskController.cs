@@ -58,6 +58,25 @@ namespace ServiceDesk.Controllers;
             });
         }
 
+        [HttpDelete]
+        [Route("delete/{id}", Name = "Delete Ticket")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var ticket = await _dbContext
+                .Set<Ticket>()
+                .FirstOrDefaultAsync(c => c.TicketId == id);
+                
+            if (ticket == null)
+            {
+                return NotFound();
+            }
+
+            this._dbContext.Set<Ticket>().Remove(ticket);
+            await _dbContext.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
         [HttpPost]
         [Route("create")]
         public async Task<IActionResult> Create([FromBody] TicketCreateForm form)
@@ -68,7 +87,6 @@ namespace ServiceDesk.Controllers;
                 {
                     var ticket = new Ticket
                     {
-                        TicketId = form.TicketId,
                         TicketText = form.TicketText,
                         CustomerId = form.CustomerId,
                         Status = form.Status,
@@ -76,15 +94,21 @@ namespace ServiceDesk.Controllers;
 
                     // insert customer
                     await _dbContext
-                    .Set<Ticket>()
-                    .AddAsync(ticket);
+                        .Set<Ticket>()
+                        .AddAsync(ticket);
                     
                     await _dbContext.SaveChangesAsync();
 
                     //TODO: send event
 
                     // return result
-                    return CreatedAtRoute("GetByCustomerId", new { ticketId = ticket.TicketId }, ticket);
+                    return this.Ok(new TicketViewModel 
+                    {
+                        TicketId = ticket.TicketId,
+                        TicketText = ticket.TicketText,
+                        Status = ticket.Status,
+                        CustomerId = ticket.CustomerId
+                    })
                 }
 
                 return BadRequest();
@@ -116,7 +140,9 @@ namespace ServiceDesk.Controllers;
                     ticket.Status = form.Status;
 
                     // Check if ticket is solved
-                    if(ticket.Status == 2)
+                    if(ticket.Status == 2) {
+                        //Send message to customer
+                    }
 
                     _dbContext
                     .Set<Ticket>()

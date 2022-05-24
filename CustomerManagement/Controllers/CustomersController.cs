@@ -55,6 +55,28 @@ namespace CustomerManagement.Controllers;
             });
         }
 
+        [HttpDelete]
+        [Route("delete/{id}", Name = "Delete customer")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var customer = await _dbContext
+                .Set<Customer>()
+                .FirstOrDefaultAsync(c => c.CustomerId == id);
+                
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            this._dbContext
+                .Set<Customer>()
+                .Remove(customer);
+            
+            await _dbContext.SaveChangesAsync();
+
+            return this.Ok();
+        }
+
         [AllowAnonymous]
         [HttpPost]
         [Route("add")]
