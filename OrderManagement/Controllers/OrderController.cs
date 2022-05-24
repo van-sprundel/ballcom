@@ -57,7 +57,7 @@ public class OrderController : Controller
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
 
-                //TODO: send event
+                //TODO: send event???
 
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
@@ -79,19 +79,31 @@ public class OrderController : Controller
     {
         try
         {
-            OrderProduct orderProduct = new OrderProduct
+            int amountProducts = _dbContext.OrderProduct
+                .Select(op => op.OrderId == orderNumber && op.ProductId == productNumber).Count();
+            if (amountProducts < 20)
             {
-                OrderId = orderNumber,
-                ProductId = productNumber
-            };
-            // Insert
-            _dbContext.OrderProduct.Add(orderProduct);
-            await _dbContext.SaveChangesAsync();
+                OrderProduct orderProduct = new OrderProduct 
+                { 
+                    OrderId = orderNumber,
+                    ProductId = productNumber
+                };
+                // Insert
+
+                _dbContext.OrderProduct.Add(orderProduct);
+                await _dbContext.SaveChangesAsync();
             
-            // TODO: send event
+                // TODO: send event???
             
-            // return result
-            return Ok();
+                // return result
+                return Ok();
+            }
+            else
+            {
+                ModelState.AddModelError("", "This order already contains 20 products, more are not allowed.");
+                return StatusCode(StatusCodes.Status412PreconditionFailed, "This order already contains 20 products, more are not allowed.");
+
+            }
 
         }
         catch (DbUpdateException)
@@ -100,5 +112,37 @@ public class OrderController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [HttpDelete]
+    [Route("{orderNumber}/{productNumber}", Name = "AddProductToOrder")]
+    public async Task<IActionResult> RemoveProductFromOrderAsync(int orderNumber, int productNumber)
+    {
+        try
+        {
+            var orderProduct = _dbContext.OrderProduct.FirstOrDefault(op =>
+                    op.OrderId == orderNumber && op.ProductId == productNumber);
+            // Remove
+            if (orderProduct != null)
+            {
+                _dbContext.OrderProduct.Remove(orderProduct);
+                await _dbContext.SaveChangesAsync();
+
+                // TODO: send event???
+            
+                // return result
+                return StatusCode(StatusCodes.Status204NoContent);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Item does not exist.");
+                return StatusCode(StatusCodes.Status404NotFound, "Item does not exist.");
+            }
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes.");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    } 
 
 }
