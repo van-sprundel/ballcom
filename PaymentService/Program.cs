@@ -2,7 +2,6 @@ using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using PaymentService;
 using PaymentService.DataAccess;
-using PaymentService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +17,7 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
 //Inject receivers
 builder.Services.AddHostedService<PaymentMessageReceiver>();
 //Inject sender
-builder.Services.AddTransient<IMessageSender>(_ => new MessageSender(new [] {"payment","customer"},"payment_exchange"));
+builder.Services.AddTransient<IMessageSender, MessageSender>();
 
 builder.Services
     .AddMvc(options => options.EnableEndpointRouting = false);

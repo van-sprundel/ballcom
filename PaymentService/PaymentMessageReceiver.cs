@@ -1,12 +1,13 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
 using PaymentService.Models;
+using RabbitMQ.Client;
 
 namespace PaymentService;
 
 public class PaymentMessageReceiver : MessageReceiver
 {
-    public PaymentMessageReceiver() : base(new[] {"payment"},"payment_exchange")
+    public PaymentMessageReceiver(IConnection connection) : base(connection, new[] {"payment"})
     {
     }
 

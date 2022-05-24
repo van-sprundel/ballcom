@@ -5,7 +5,7 @@ source ./build.sh CustomerManagement &&
 source ./build.sh InventoryManagement &&
 source ./build.sh NotificationService &&
 source ./build.sh OrderManagement &&
-source ./build.sh OrderPicker && 
+source ./build.sh Orderpicker && 
 source ./build.sh PaymentService &&
 source ./build.sh ServiceDesk &&
 source ./build.sh SupplierManagement &&

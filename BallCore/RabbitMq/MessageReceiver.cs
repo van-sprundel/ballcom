@@ -13,20 +13,20 @@ namespace BallCore.RabbitMq;
 /// </summary>
 public abstract class MessageReceiver : IHostedService
 {
-    private IConnection? _connection;
+    private readonly IConnection _connection;
     private IModel? _channel;
     private AsyncEventingBasicConsumer? _consumer;
     private readonly string[] _queues;
-    private readonly string[] _exchanges;
 
     /// <summary>
     /// Specify which queues you want to subscribe to
     /// </summary>
-    /// <param name="queues">The queues to bind to the exchange</param>
-    protected MessageReceiver(IEnumerable<string> queues, IEnumerable<string> exchanges)
+    /// <param name="connection">The RabbitMQ connection</param>
+    /// <param name="queues">The queues to listen to</param>
+    protected MessageReceiver(IConnection connection, IEnumerable<string> queues)
     {
         _queues = queues.ToArray();
-        _exchanges = exchanges.ToArray();
+        _connection = connection;
     }
 
     /// <summary>
@@ -37,29 +37,13 @@ public abstract class MessageReceiver : IHostedService
         return Task.Run(() =>
         {
             Console.WriteLine("Creating and starting RabbitMq receiver service");
-
-            var factory = new ConnectionFactory
-            {
-                HostName = "rabbitmq",
-                Port = 5672,
-                UserName = "Rathalos",
-                Password = "1234",
-                DispatchConsumersAsync = true
-            };
-
-            //Create connection with broker
-            _connection = factory.CreateConnection();
-
+            
             //Create channel within connection. Note: a connection can contain multiple channels, but we use a connection per message receiver instance
             _channel = _connection.CreateModel();
             
             //Declare queues
             foreach (var q in _queues)
                 _channel.QueueDeclare(queue: q, durable: true, exclusive: false, autoDelete: false, arguments: null);
-            
-            //Declare exchanges
-            foreach (var e in _exchanges)
-                _channel.ExchangeDeclare(e, "fanout", durable: true, autoDelete: false);
 
             _consumer = new AsyncEventingBasicConsumer(_channel);
             _consumer.Received += Consumer_Received;
@@ -118,7 +102,6 @@ public abstract class MessageReceiver : IHostedService
         }
 
         await Task.Yield();
-        // _channel!.BasicAck(ea.DeliveryTag, false); //TODO: (when) do we need this? This says: i consumed it, remove it from queue
     }
 
     /// <summary>
@@ -135,7 +118,6 @@ public abstract class MessageReceiver : IHostedService
     {
         Console.WriteLine("Stopping RabbitMq receiver service");
         _channel?.Dispose();
-        _connection?.Dispose();
         _consumer = null;
         return Task.CompletedTask;
     }
