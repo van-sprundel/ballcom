@@ -14,6 +14,7 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
         ServerVersion.AutoDetect(mariaDbConnectionString)
     )
 );
+
 // Create connection
 var connection = new ConnectionFactory
 {
@@ -26,6 +27,8 @@ var connection = new ConnectionFactory
 
 builder.Services.AddSingleton(connection);
 
+// create exchange factory
+// each exchange needs to know which queues it's going to send data to
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
     { "payment_exchange", new []{ "payment", "customer" } },
