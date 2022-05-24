@@ -1,12 +1,13 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
 using PaymentService.Models;
+using RabbitMQ.Client;
 
 namespace PaymentService;
 
 public class PaymentMessageReceiver : MessageReceiver
 {
-    public PaymentMessageReceiver() : base(new[] { "general", "testnet", "payment"  })
+    public PaymentMessageReceiver(IConnection connection) : base(connection, new[] {"payment"})
     {
     }
 
@@ -18,7 +19,12 @@ public class PaymentMessageReceiver : MessageReceiver
         {
             case DomainEvent {Payload: Order order} de:
             {
-                Console.WriteLine($"Received {de.Type} message {order.OrderId} : {order.isPaid}");
+                Console.WriteLine($"Received {de.Type} message {de.Name} from {de.Destination} : {order.isPaid}");
+                break;
+            }
+            default:
+            {
+                Console.WriteLine("lol");
                 break;
             }
         }

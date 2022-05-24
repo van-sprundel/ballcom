@@ -10,7 +10,7 @@ echo "Starting..."
 .\build.ps1 SupplierManagement
 .\build.ps1 TransportManagement
 
-echo "Done!"
+Write-Host "Finished!" -ForegroundColor Blue
 echo "Building docker containers with docker-compose"
 
 docker-compose build

@@ -3,12 +3,15 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\BallCore\BallCore.csproj" />
+        <ProjectReference Include="..\OrderManagement\OrderManagement.csproj" />
     </ItemGroup>
     
     <ItemGroup>

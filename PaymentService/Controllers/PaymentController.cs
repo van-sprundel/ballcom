@@ -50,7 +50,7 @@ public class PaymentController : Controller
         await _dbContext.SaveChangesAsync();
 
         //Send domain event to broker
-        _rmq.Send(new DomainEvent(order, EventType.Updated, "general"));
+        _rmq.Send(new DomainEvent(order, EventType.Updated, "payment_exchange",true));
         
         return await Task.FromResult(Ok(order));
     }

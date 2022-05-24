@@ -11,15 +11,18 @@ public class DomainEvent : IEvent
     /// The event type (Created, Updated, Deleted etc)
     /// </summary>
     public EventType Type { get; }
-    
+
     /// <summary>
     /// The payload object (like a Customer)
     /// </summary>
     public IDomainModel Payload { get; }
-
-    /// <inheritdoc cref="IEvent.Channel"/>
-    public string Channel { get; }
     
+    /// <inheritdoc cref="IEvent.Destination"/>
+    public string Destination { get; }
+    
+    /// <inheritdoc cref="IEvent.UseExchange"/>
+    public bool UseExchange { get; }
+
     /// <summary>
     /// The event name (like CustomerCreated) but seperated with dot to ease parsing (Customer.Created)
     /// </summary>
@@ -33,11 +36,13 @@ public class DomainEvent : IEvent
     /// </summary>
     /// <param name="payload">The payload model object</param>
     /// <param name="type">The event type</param>
-    /// <param name="channel">The channel the event must be sent to/is received from</param>
-    public DomainEvent(IDomainModel payload, EventType type, string channel)
+    /// <param name="destination">The destination the event must be received from</param>
+    /// <param name="useExchange">whether the destination is an exchange or channel</param>
+    public DomainEvent(IDomainModel payload, EventType type, string destination, bool useExchange = false)
     {
         Type = type;
-        Channel = channel;
+        Destination = destination;
+        UseExchange = useExchange;
         Payload = payload;
     }
 }

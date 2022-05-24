@@ -8,27 +8,15 @@ namespace BallCore.RabbitMq;
 /// </summary>
 public class MessageSender : IMessageSender, IDisposable
 {
-    private readonly IConnection? _connection;
     private readonly IModel? _channel;
-    private readonly List<string> _queues;
+    private readonly List<string> _declaredQueues;
 
-    public MessageSender()
+    public MessageSender(IConnection connection)
     {
         Console.WriteLine("Creating and starting RabbitMq service");
 
-        var factory = new ConnectionFactory
-        {
-            HostName = "rabbitmq",
-            Port = 5672,
-            UserName = "Rathalos",
-            Password = "1234",
-            DispatchConsumersAsync = true
-        };
-        
-        //Create connection with broker
-        _connection = factory.CreateConnection();
-        _channel = _connection.CreateModel();
-        _queues = new List<string>();
+        _channel = connection.CreateModel();
+        _declaredQueues = new List<string>();
     }
 
     /// <summary>
@@ -40,23 +28,24 @@ public class MessageSender : IMessageSender, IDisposable
         var props = _channel!.CreateBasicProperties();
         props.ContentType = "application/json";
         props.Type = e.Name;
-        
-        //Create queue if it does not exist
-        if (!_queues.Contains(e.Channel))
+
+        _channel.BasicQos(0, 1, false);
+
+        if (!e.UseExchange && !_declaredQueues.Contains(e.Destination))
         {
-            _channel.QueueDeclare(queue: e.Channel, durable: false, exclusive: false, autoDelete: false, arguments: null);
-            _queues.Add(e.Channel);
+            _channel.QueueDeclare(queue: e.Destination, durable: true, exclusive: false, autoDelete: false,
+                arguments: null);
+            _declaredQueues.Add(e.Destination);
         }
-        
+
         //Publish message to queue
-        _channel.BasicPublish(exchange: "", routingKey: e.Channel, basicProperties: props, body: e.Serialize());
+        _channel.BasicPublish(exchange: e.UseExchange ? e.Destination : "", e.UseExchange ? "" : e.Destination, basicProperties: props, body: e.Serialize(),
+            mandatory: true);
     }
 
     public void Dispose()
     {
         Console.WriteLine("Stopping RabbitMq service");
-        _queues.Clear();
         _channel?.Dispose();
-        _connection?.Dispose();
     }
 }

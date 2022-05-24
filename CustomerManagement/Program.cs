@@ -5,6 +5,7 @@ using CustomerManagement;
 using CustomerManagement.DataAccess;
 using CustomerManagement.Models;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +15,34 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+//Create connection
+IConnection connection = new ConnectionFactory
+{
+    HostName = "rabbitmq",
+    Port = 5672,
+    UserName = "Rathalos",
+    Password = "1234",
+    DispatchConsumersAsync = true
+}.CreateConnection();
+
+builder.Services.AddSingleton(connection);
+
+//Inject ExchangeDeclarator
+var exchanges = new Dictionary<string, IEnumerable<string>>
+{
+    { "payment_exchange", new []{ "payment", "customer" } },
+    { "customer_exchange", new [] { "general" } }
+};
+
+builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+
 //Inject receiver
 builder.Services.AddHostedService<CustomerMessageReceiver>();
 
 //Inject sender
-builder.Services.AddSingleton<IMessageSender, MessageSender>();
+builder.Services.AddTransient<IMessageSender, MessageSender>();
+
+
 
 // Add framework services
 builder.Services
@@ -54,7 +78,7 @@ app.MapGet("/send", (IMessageSender rmq) =>
     };
 
     //Send domain event to broker
-    rmq.Send(new DomainEvent(customer, EventType.Created, "general"));
+    rmq.Send(new DomainEvent(customer, EventType.Created, "general", false));
     
     Console.WriteLine("Sending message");
     return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");
