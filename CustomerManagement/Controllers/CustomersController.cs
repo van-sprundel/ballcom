@@ -17,17 +17,8 @@ namespace CustomerManagement.Controllers;
         }
 
         [HttpGet]
-        [Route("test", Name = "Test")]
-        public async Task<IActionResult> Test()
-        {
-            return await Task.FromResult(Ok("test"));
-        }
-
-        [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
-            Console.WriteLine("called");
-
             var customers = await _dbContext.Set<Customer>().Select(
                 x => new CustomerViewModel
                 {
@@ -67,7 +58,7 @@ namespace CustomerManagement.Controllers;
         [AllowAnonymous]
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> RegisterAsync([FromBody] CreateCustomerViewModel form)
+        public async Task<IActionResult> RegisterAsync([FromBody] CreateCustomerForm form)
         {
             try
             {

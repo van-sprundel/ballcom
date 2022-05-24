@@ -1,7 +1,7 @@
 ﻿using System;
 namespace CustomerManagement.Models;
 
-public class CreateCustomerViewModel
+public class CreateCustomerForm
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
