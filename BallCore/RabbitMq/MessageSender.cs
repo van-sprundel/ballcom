@@ -27,7 +27,7 @@ public class MessageSender : IMessageSender, IDisposable
             Password = "1234",
             // DispatchConsumersAsync = true
         };
-        
+
         //Create connection with broker
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
@@ -44,18 +44,27 @@ public class MessageSender : IMessageSender, IDisposable
         var props = _channel!.CreateBasicProperties();
         props.ContentType = "application/json";
         props.Type = e.Name;
-        
-        _channel.ExchangeDeclare(_exchange, "fanout",durable:true,autoDelete:false);
-        _channel.BasicQos(0,1,false);
+
+        _channel.ExchangeDeclare(_exchange, "fanout", durable: true, autoDelete: false);
+        _channel.BasicQos(0, 1, false);
         foreach (var queueName in _queues)
         {
-            _channel.QueueDeclare(queue: queueName, durable:true, exclusive: false, autoDelete: false,
+            _channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false,
                 arguments: null);
             _channel.QueueBind(queueName, _exchange, "", null);
         }
-        
+
         //Publish message to queue
-        _channel.BasicPublish(exchange: e.Exchange,"", basicProperties: props, body: e.Serialize(),mandatory:true);
+        if (e.UseExchange)
+        {
+            _channel.BasicPublish(exchange: e.Destination, "", basicProperties: props, body: e.Serialize(),
+                mandatory: true);
+        }
+        else
+        {
+            _channel.BasicPublish(exchange: "", e.Destination, basicProperties: props, body: e.Serialize(),
+                mandatory: true);
+        }
     }
 
     public void Dispose()

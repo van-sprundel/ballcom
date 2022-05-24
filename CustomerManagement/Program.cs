@@ -54,7 +54,7 @@ app.MapGet("/send", (IMessageSender rmq) =>
     };
 
     //Send domain event to broker
-    rmq.Send(new DomainEvent(customer, EventType.Created, "","customer_exchange"));
+    rmq.Send(new DomainEvent(customer, EventType.Created, "customer_exchange",true));
     
     Console.WriteLine("Sending message");
     return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");

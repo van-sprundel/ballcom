@@ -16,13 +16,10 @@ public class DomainEvent : IEvent
     /// The payload object (like a Customer)
     /// </summary>
     public IDomainModel Payload { get; }
+    
 
-
-    /// <inheritdoc cref="IEvent.Exchange"/>
-    public string Exchange { get; }
-
-    /// <inheritdoc cref="IEvent.Channel"/>
-    public string Channel { get; }
+    public string Destination { get; }
+    public bool UseExchange { get; }
 
     /// <summary>
     /// The event name (like CustomerCreated) but seperated with dot to ease parsing (Customer.Created)
@@ -42,15 +39,8 @@ public class DomainEvent : IEvent
     public DomainEvent(IDomainModel payload, EventType type, string destination, bool useExchange)
     {
         Type = type;
-        if (useExchange)
-        {
-            Exchange = destination;
-        }
-        else
-        {
-            Channel = destination;
-        }
-
+        Destination = destination;
+        UseExchange = useExchange;
         Payload = payload;
     }
 }

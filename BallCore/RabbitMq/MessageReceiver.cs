@@ -104,7 +104,14 @@ public abstract class MessageReceiver : IHostedService
                 //1. Deserialize body to object of expected type
                 var obj = (IDomainModel)JsonSerializer.Deserialize(ea.Body.ToArray(), type)!;
                 //2. Create Event object and call handler
-                await HandleMessage(new DomainEvent(obj, eventType, "", ea.Exchange));
+                if (string.IsNullOrEmpty(ea.Exchange))
+                {
+                    await HandleMessage(new DomainEvent(obj, eventType,  ea.RoutingKey,false));
+                }
+                else
+                {
+                    await HandleMessage(new DomainEvent(obj, eventType,  ea.Exchange,true));
+                }
             }
             else
             {
@@ -115,8 +122,14 @@ public abstract class MessageReceiver : IHostedService
         else
         {
             //Not a domain event
-            await HandleMessage(new RawEvent(ea.RoutingKey, ea.Exchange, ea.BasicProperties.Type,
-                ea.Body.ToArray()));
+            if (string.IsNullOrEmpty(ea.Exchange))
+            {
+                await HandleMessage(new RawEvent( ea.BasicProperties.Type, ea.Body.ToArray(),ea.RoutingKey, false));
+            }
+            else
+            {
+                await HandleMessage(new RawEvent( ea.BasicProperties.Type, ea.Body.ToArray(),ea.Exchange, true));
+            }
         }
 
         await Task.Yield();

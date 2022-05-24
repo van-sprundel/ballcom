@@ -11,14 +11,14 @@ public interface IEvent
     /// The exchange the event must be send to
     /// </summary>
     [JsonIgnore]
-    public string Exchange { get; }
+    public string Destination { get; }
     
     /// <summary>
-    /// The channel the event must be send to
+    /// Whether to use exhange or queue
     /// </summary>
     [JsonIgnore]
-    public string Channel { get; }
-    
+    public bool UseExchange { get; }
+
     /// <summary>
     /// The event name
     /// </summary>

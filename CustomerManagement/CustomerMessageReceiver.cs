@@ -1,7 +1,6 @@
 using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement.Models;
-using OrderManagement.Models;
 
 namespace CustomerManagement;
 
@@ -19,12 +18,12 @@ public class CustomerMessageReceiver : MessageReceiver
         {
             case DomainEvent {Payload: Customer c} de:
             {
-                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Exchange}{de} : {c.FirstName}");
+                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Destination} : {c.FirstName}");
                 break;
             }
-            default:
+            case DomainEvent {Payload: Order o} de:
             {
-                Console.WriteLine("lol");
+                Console.WriteLine($"Received {de.Type} message ({de.Name}) from {de.Destination} : {o.isPaid}");
                 break;
             }
         }
