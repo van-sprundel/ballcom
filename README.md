@@ -8,7 +8,7 @@ Om scripts uit te voeren in powershell moet het volgende commando in een powersh
 Set-ExecutionPolicy Unrestricted
 ```
 
-Druk vervolgens op `A` om alles te accepteren.
+Druk vervolgens op `A` om  alles te accepteren.
 
 # Bouwen van dotnet en containers
 

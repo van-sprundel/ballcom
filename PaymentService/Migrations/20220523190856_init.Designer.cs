@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ServiceDesk.DataAccess;
+using PaymentService.DataAccess;
 
 #nullable disable
 
-namespace ServiceDesk.Migrations
+namespace PaymentService.Migrations
 {
-    [DbContext(typeof(ServiceDeskDbContext))]
-    [Migration("20220517141944_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(PaymentServiceDbContext))]
+    [Migration("20220523190856_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,13 +20,17 @@ namespace ServiceDesk.Migrations
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("ServiceDesk.Models.Customer", b =>
+            modelBuilder.Entity("PaymentService.Models.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -39,38 +43,61 @@ namespace ServiceDesk.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("ServiceDesk.Models.Ticket", b =>
+            modelBuilder.Entity("PaymentService.Models.Invoice", b =>
                 {
-                    b.Property<int>("TicketId")
+                    b.Property<int>("InvoiceId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("InvoiceNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("TicketText")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Orderid")
+                        .HasColumnType("int");
 
-                    b.HasKey("TicketId");
+                    b.HasKey("InvoiceId");
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Tickets");
+                    b.HasIndex("Orderid");
+
+                    b.ToTable("Invoices");
                 });
 
-            modelBuilder.Entity("ServiceDesk.Models.Ticket", b =>
+            modelBuilder.Entity("PaymentService.Models.Order", b =>
                 {
-                    b.HasOne("ServiceDesk.Models.Customer", "Customer")
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<bool>("isPaid")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("OrderId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("PaymentService.Models.Invoice", b =>
+                {
+                    b.HasOne("PaymentService.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PaymentService.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("Orderid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Order");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,8 +10,8 @@ using TransportManagement.DataAccess;
 namespace TransportManagement.Migrations
 {
     [DbContext(typeof(TransportManagementDbContext))]
-    [Migration("20220517162725_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220523191304_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

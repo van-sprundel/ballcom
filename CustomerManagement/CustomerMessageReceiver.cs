@@ -6,7 +6,7 @@ namespace CustomerManagement;
 
 public class CustomerMessageReceiver : MessageReceiver
 {
-    public CustomerMessageReceiver() : base(new[] { "general", "testnet" })
+    public CustomerMessageReceiver() : base(new[] { "general", "testnet"})
     {
     }
 

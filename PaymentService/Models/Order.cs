@@ -1,7 +1,11 @@
-﻿namespace PaymentService.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using BallCore;
 
-public class Order
+namespace PaymentService.Models;
+
+public class Order : IDomainModel
 {
+    [Key]
     public int OrderId { get; set; }
     public bool isPaid { get; set; }
 
