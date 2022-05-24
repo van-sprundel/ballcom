@@ -2,6 +2,7 @@ using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using PaymentService;
 using PaymentService.DataAccess;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,24 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
         ServerVersion.AutoDetect(mariaDbConnectionString)
     )
 );
+// Create connection
+var connection = new ConnectionFactory
+{
+    HostName = "rabbitmq",
+    Port = 5672,
+    UserName = "Rathalos",
+    Password = "1234",
+    DispatchConsumersAsync = true
+}.CreateConnection();
+
+builder.Services.AddSingleton(connection);
+
+var exchanges = new Dictionary<string, IEnumerable<string>>
+{
+    { "payment_exchange", new []{ "payment", "customer" } },
+};
+
+builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
 //Inject receivers
 builder.Services.AddHostedService<PaymentMessageReceiver>();

@@ -17,7 +17,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseMvc();
+builder.Services
+    .AddMvc(options => options.EnableEndpointRouting = false);
 app.UseDefaultFiles();
 app.UseStaticFiles();
 

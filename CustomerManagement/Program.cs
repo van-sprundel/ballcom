@@ -30,7 +30,6 @@ builder.Services.AddSingleton(connection);
 //Inject ExchangeDeclarator
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "payment_exchange", new []{ "payment", "customer" } },
     { "customer_exchange", new [] { "general" } }
 };
 
@@ -41,8 +40,6 @@ builder.Services.AddHostedService<CustomerMessageReceiver>();
 
 //Inject sender
 builder.Services.AddTransient<IMessageSender, MessageSender>();
-
-
 
 // Add framework services
 builder.Services

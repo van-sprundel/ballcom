@@ -45,12 +45,15 @@ public class PaymentController : Controller
             return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
         }
 
-        order.isPaid = true;
-        _dbContext.Orders.Update(order);
-        await _dbContext.SaveChangesAsync();
+        if (!order.isPaid)
+        {
+            order.isPaid = true;
+            _dbContext.Orders.Update(order);
+            await _dbContext.SaveChangesAsync();
 
-        //Send domain event to broker
-        _rmq.Send(new DomainEvent(order, EventType.Updated, "payment_exchange",true));
+            //Send domain event to broker
+            _rmq.Send(new DomainEvent(order, EventType.Updated, "payment_exchange",true));
+        }
         
         return await Task.FromResult(Ok(order));
     }
