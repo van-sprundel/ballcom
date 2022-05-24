@@ -25,6 +25,14 @@ public class SupplierController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
+        var suppliers = await _dbContext.Set<Supplier>().Select(
+            x => new SupplierViewModel
+            {
+                Name = form.Name,
+                Email = form.Email,
+                Products = new List<Product>()
+            }).ToListAsync();
+
         return Ok(await _dbContext.Suppliers.ToListAsync());
     }
 
@@ -46,11 +54,12 @@ public class SupplierController : Controller
         {
             SupplierId = supplier.SupplierId,
             Name = supplier.Name,
-            Email = supplier.Email
+            Email = supplier.Email,
         });
     }
 
     [HttpPost]
+    [Route("add")]
     public async Task<IActionResult> AddSupplierAsync([FromBody] CreateSupplierViewModel form)
     {
         try
@@ -60,13 +69,16 @@ public class SupplierController : Controller
                 var supplier = new Supplier
                 {
                     Name = form.Name,
-                    Email = form.Email
+                    Email = form.Email,
+                    Products = new List<Product>()
                 };
                 _dbContext.Suppliers.Add(supplier);
                 await _dbContext.SaveChangesAsync();
             }
-
-            return BadRequest();
+            else
+            {
+                return BadRequest();
+            }
         }
         catch (DbUpdateException)
         {
