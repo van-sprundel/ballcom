@@ -63,7 +63,63 @@ public class TransportCompanyController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
+
+    [HttpPut]
+    [Route("{companyId}", Name = "EditTransportCompany")]
+    public async Task<IActionResult> EditTransportCompany([FromBody] TransportCompany form, int companyId)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var existingCompany = _dbContext.TransportCompanies.FirstOrDefault(tc => tc.TransportCompanyId == companyId);
+            if (existingCompany == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Transport Company not found.");
+            }
+
+            existingCompany.Name = form.Name;
+            existingCompany.PricePerKm = form.PricePerKm;
+
+            _dbContext.TransportCompanies.Update(existingCompany);
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(StatusCodes.Status202Accepted);
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpDelete]
+    [Route("{companyId:int}", Name = "DeleteTransportCompany")]
+    public async Task<IActionResult> DeleteTransportCompany(int companyId)
+    {
+        try
+        {
+            var existingCompany = await _dbContext.TransportCompanies.FirstOrDefaultAsync(tc => tc.TransportCompanyId == companyId);
+            if (existingCompany == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, "Company could not be found");
+            }
+
+            _dbContext.TransportCompanies.Remove(existingCompany);
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(StatusCodes.Status204NoContent);
+
+        }
+        catch (DbUpdateException )
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
     
-    
+
+
 
 }
