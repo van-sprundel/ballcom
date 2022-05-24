@@ -8,7 +8,14 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<ServiceDeskDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.MapControllers();
 
 app.MapGet("/", () => "Hello World from servicedesk!");
 
