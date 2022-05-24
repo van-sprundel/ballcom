@@ -69,17 +69,6 @@ public class CustomersController : Controller
         return Ok(customer);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> RegisterAsync([FromBody] Customer customer)
-        this._dbContext
-            .Set<Customer>()
-            .Remove(customer);
-
-        await _dbContext.SaveChangesAsync();
-
-        return this.Ok();
-    }
-
     [AllowAnonymous]
     [HttpPost]
     [Route("add")]
