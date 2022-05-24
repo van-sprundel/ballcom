@@ -7,5 +7,5 @@ public class Product
     public int Quantity { get; set; }
     public  double Price { get; set; }
     
-    public List<Order> Orders { get; set; }
+    public ICollection<OrderProduct> OrderProducts { get; set; }
 }
