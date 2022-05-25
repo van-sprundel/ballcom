@@ -1,4 +1,6 @@
 ﻿using BallCore.Enums;
+using BallCore.Events;
+using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransportManagement.DataAccess;
@@ -10,10 +12,12 @@ namespace TransportManagement.Controllers;
 public class OrderController : Controller
 {
     private readonly TransportManagementDbContext _dbContext;
+    private readonly IMessageSender _rmq;
 
-    public OrderController(TransportManagementDbContext dbContext)
+    public OrderController(TransportManagementDbContext dbContext, IMessageSender rmq)
     {
         _dbContext = dbContext;
+        _rmq = rmq;
     }
 
     [HttpGet]
@@ -57,8 +61,6 @@ public class OrderController : Controller
             order.TransportCompanyId = transportId;
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();
-            
-            // TODO: Send event???
 
             return StatusCode(StatusCodes.Status202Accepted);
 
@@ -96,7 +98,8 @@ public class OrderController : Controller
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();
             
-            // TODO: Send event???
+            // Send event
+            _rmq.Send(new DomainEvent(order, EventType.Updated, "order", true));
 
             return StatusCode(StatusCodes.Status202Accepted);
 
