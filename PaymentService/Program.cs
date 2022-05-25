@@ -18,7 +18,7 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
 // Create connection
 var connection = new ConnectionFactory
 {
-    HostName = "rabbitmq",
+    HostName = "localhost",
     Port = 5672,
     UserName = "Rathalos",
     Password = "1234",
@@ -36,10 +36,11 @@ var exchanges = new Dictionary<string, IEnumerable<string>>
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
-//Inject receivers
-builder.Services.AddHostedService<PaymentMessageReceiver>();
 //Inject sender
 builder.Services.AddTransient<IMessageSender, MessageSender>();
+//Inject receivers
+builder.Services.AddHostedService<PaymentMessageReceiver>();
+
 
 builder.Services
     .AddMvc(options => options.EnableEndpointRouting = false);

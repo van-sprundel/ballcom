@@ -687,4 +687,8 @@
       <ProjectReference Include="..\BallCore\BallCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations" />
+    </ItemGroup>
+
 </Project>

@@ -2,15 +2,15 @@ $path = $args[0]
 $out_path = $path+'/out'
 
 $msg = "Building " + $out_path
-echo $msg
+Write-Host $msg -ForegroundColor Magenta
 
 if (-not(Test-Path -Path $out_path)) {
     mkdir $out_path
 } else {
-    echo "Emptying /out"
+    Write-Host "Emptying /out..." -ForegroundColor Red
     Remove-Item -path $out_path/* -r
 }
 
-.\build-dotnet.ps1 $path
+dotnet publish $path -c Release -r linux-musl-x64 --self-contained true -o $out_path
 
-Write-Host "Done!" -ForegroundColor Green
+Write-Host "Success!" -ForegroundColor Green

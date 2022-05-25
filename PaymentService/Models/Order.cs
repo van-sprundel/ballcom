@@ -7,6 +7,8 @@ public class Order : IDomainModel
 {
     [Key]
     public int OrderId { get; set; }
-    public bool isPaid { get; set; }
+    public bool IsPaid { get; set; }
+    public StatusProcess StatusProcess { get; set; }
+
 
 }
