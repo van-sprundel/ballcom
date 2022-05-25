@@ -30,7 +30,7 @@ builder.Services.AddSingleton(connection);
 //Inject ExchangeDeclarator
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "customer_exchange", new [] { "general" } }
+    { "customer_exchange", new [] { "payment", "servicedesk", "notifications" } }
 };
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
