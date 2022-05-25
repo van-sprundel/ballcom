@@ -1,6 +1,9 @@
-﻿namespace OrderManagement.Models;
+﻿using BallCore;
+using BallCore.Enums;
 
-public class Order
+namespace OrderManagement.Models;
+
+public class Order : IDomainModel
 {
     public int OrderId { get; set; }
     public string ArrivalCity { get; set; }

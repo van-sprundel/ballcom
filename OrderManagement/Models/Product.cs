@@ -1,6 +1,8 @@
-﻿namespace OrderManagement.Models;
+﻿using BallCore;
 
-public class Product
+namespace OrderManagement.Models;
+
+public class Product : IDomainModel
 {
     public int ProductId { get; set; }
     public string Name { get; set; }
