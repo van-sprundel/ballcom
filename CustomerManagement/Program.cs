@@ -18,7 +18,7 @@ builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
 //Create connection
 IConnection connection = new ConnectionFactory
 {
-    HostName = "rabbitmq",
+    HostName = "localhost",
     Port = 5672,
     UserName = "Rathalos",
     Password = "1234",
@@ -62,6 +62,19 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World suppliermanagement!");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<CustomerManagementDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
+
+
 
 Console.WriteLine("Starting application");
 app.Run();

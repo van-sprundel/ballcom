@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace OrderManagement.Migrations
+namespace CustomerManagement.Migrations
 {
-    public partial class listOrderInCustomer : Migration
+    public partial class init3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
