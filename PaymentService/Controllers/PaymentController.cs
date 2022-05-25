@@ -42,9 +42,8 @@ public class PaymentController : Controller
         order.IsPaid = true;
         _dbContext.Orders.Update(order);
         await _dbContext.SaveChangesAsync();
-
-        //Send domain event to broker
-        _rmq.Send(new DomainEvent(order, EventType.Updated, "payment_exchange", true));
+        
+        //TODO create invoice
 
         return await Task.FromResult(new OkObjectResult(order));
     }

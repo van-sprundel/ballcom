@@ -2,6 +2,11 @@
 
 ## Instructies voor Developers
 
+### Migrations
+
+Omdat projecten nu afhankelijk zijn van rabbitmq, zullen database updates falen.\
+Je zal met `docker-compose up rabbitmq` in de achtergrond migrations moeten doen.\
+Ook is de HostName voor nu `localhost`, omdat deze service nu nergens online draait.
 ### Broker
 
 Om services aan de broker toe te voegen moet je deze in `Program.cs` definiëren.\
