@@ -63,12 +63,5 @@ app.MapControllers();
 
 app.MapGet("/", () => "Hello World suppliermanagement!");
 
-//Send domain event to broker
-rmq.Send(new DomainEvent(customer, EventType.Created, "general", false));
-
-Console.WriteLine("Sending message");
-return Results.Ok($"Sent message: {JsonSerializer.Serialize(customer)}");
-
-
 Console.WriteLine("Starting application");
 app.Run();

@@ -31,7 +31,7 @@ public class SupplierController : Controller
 
     [HttpGet]
     [Route("{supplierId}", Name = "GetBySupplierId")]
-    public async Task<IActionResult> GetAsync(int id)
+    public async Task<IActionResult> GetAsync(int supplierId)
     {
         var supplier = await _dbContext
             .Set<Supplier>()
