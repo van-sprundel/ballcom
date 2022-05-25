@@ -28,9 +28,9 @@ public class SupplierController : Controller
         var suppliers = await _dbContext.Set<Supplier>().Select(
             x => new SupplierViewModel
             {
-                Name = form.Name,
-                Email = form.Email,
-                Products = form.Products
+                Name = x.Name,
+                Email = x.Email,
+                Products = x.Products
             }).ToListAsync();
 
         return Ok(await _dbContext.Suppliers.ToListAsync());
@@ -43,7 +43,7 @@ public class SupplierController : Controller
     {
         var supplier = await _dbContext
             .Set<Supplier>()
-            .FirstOrDefaultAsync(c => c.SupplierId == supplierId);
+            .FirstOrDefaultAsync(c => c.SupplierId == id);
 
         if (supplier == null)
         {
@@ -54,7 +54,7 @@ public class SupplierController : Controller
         {
             Name = supplier.Name,
             Email = supplier.Email,
-            Products = form.Products
+            Products = supplier.Products
         });
     }
 
@@ -74,6 +74,8 @@ public class SupplierController : Controller
                 };
                 _dbContext.Suppliers.Add(supplier);
                 await _dbContext.SaveChangesAsync();
+                return CreatedAtRoute("GetBySupplierId", new { supplierId = supplier.SupplierId }, supplier);
+
             }
             else
             {
