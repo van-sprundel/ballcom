@@ -61,6 +61,7 @@ public class OrderpickerController : Controller
                         OrderId = orderNumber,
                         ProductId = productNumber
                     };
+                    order.OrderStatus = StatusProcess.Collecting;
                     // Insert
                     _dbContext.OrderProducts.Add(orderProduct);
                     _dbContext.Orders.Update(order);

@@ -37,12 +37,16 @@ public class ProductController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProductAsync([FromBody] Product product)
+    public async Task<IActionResult> AddProductAsync([FromBody] CreateProductViewModel form)
     {
         try
         {
             if (ModelState.IsValid)
             {
+                var product = new Product
+                {
+                    Name = form.Name,
+                };
                 _dbContext.Products.Add(product);
                 await _dbContext.SaveChangesAsync();
             }
