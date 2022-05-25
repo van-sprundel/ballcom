@@ -1,5 +1,6 @@
 using BallCore.Events;
 using BallCore.RabbitMq;
+using CustomerManagement.DataAccess;
 using CustomerManagement.Models;
 using RabbitMQ.Client;
 
@@ -7,8 +8,11 @@ namespace CustomerManagement;
 
 public class CustomerMessageReceiver : MessageReceiver
 {
-    public CustomerMessageReceiver(IConnection connection) : base(connection, new[] {"customer", "general"})
+    private readonly CustomerManagementDbContext _dbContext;
+
+    public CustomerMessageReceiver(CustomerManagementDbContext dbContext, IConnection connection) : base(connection, new[] {"customer", "general"})
     {
+        this._dbContext = dbContext;
     }
 
     // Example of how to handle message

@@ -1,6 +1,8 @@
-﻿namespace ServiceDesk.Models;
+﻿using BallCore;
 
-public class Customer
+namespace ServiceDesk.Models;
+
+public class Customer : IDomainModel
 {
     public int CustomerId { get; set; }
     public string LastName { get; set; }
