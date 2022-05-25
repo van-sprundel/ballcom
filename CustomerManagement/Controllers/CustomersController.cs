@@ -3,6 +3,8 @@ using CustomerManagement.DataAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BallCore.RabbitMq;
+using BallCore.Events;
 
 namespace CustomerManagement.Controllers;
 
@@ -10,10 +12,12 @@ namespace CustomerManagement.Controllers;
 public class CustomersController : Controller
 {
     CustomerManagementDbContext _dbContext;
+    IMessageSender _messageSender;
 
-    public CustomersController(CustomerManagementDbContext dbContext)
+    public CustomersController(CustomerManagementDbContext dbContext, IMessageSender messageSender)
     {
         _dbContext = dbContext;
+        _messageSender = messageSender;
     }
 
     [HttpGet]
@@ -93,7 +97,7 @@ public class CustomersController : Controller
                 await _dbContext.SaveChangesAsync();
 
                 //TODO: send event
-
+                _messageSender.Send(new DomainEvent(customer, EventType.Created, "customer_exchange", true));
                 // return result
                 return CreatedAtRoute("GetByCustomerId", new { customerId = customer.CustomerId }, customer);
             }

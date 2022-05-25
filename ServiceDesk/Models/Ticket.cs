@@ -1,6 +1,8 @@
-﻿namespace ServiceDesk.Models;
+﻿using BallCore;
 
-public class Ticket
+namespace ServiceDesk.Models;
+
+public class Ticket : IDomainModel
 {
     public int TicketId { get; set; }
     public string TicketText { get; set; }

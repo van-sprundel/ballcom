@@ -24,4 +24,10 @@
       <Folder Include="Migrations" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <ProjectReference Include="..\BallCore\BallCore.csproj" />
+      <ProjectReference Include="..\OrderManagement\OrderManagement.csproj" />
+    </ItemGroup>
+
 </Project>
