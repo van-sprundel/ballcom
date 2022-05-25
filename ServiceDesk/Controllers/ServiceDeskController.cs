@@ -184,7 +184,10 @@ public class ServiceDeskController : Controller
                 await _dbContext.SaveChangesAsync();
 
                 //TODO: send event
-                this._messageSender.Send(new DomainEvent(ticket, EventType.Created, ))
+                //TODO
+                //TODO
+                //TODO: DIT GAF NOG EEN ERROR. GEEN IDEE WAT IK ERMEE MOT.
+                // this._messageSender.Send(new DomainEvent(ticket, EventType.Created,));
                 // return result
                 return Ok(new TicketViewModel
                 {
