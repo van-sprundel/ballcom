@@ -1,5 +1,6 @@
 using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OrderManagement;
 using OrderManagement.DataAccess;
 using RabbitMQ.Client;
@@ -28,7 +29,8 @@ builder.Services.AddSingleton(connection);
 // each exchange needs to know which queues it's going to send data to
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "order_exchange", new []{ "order" } },
+    { "order_exchange_order", new []{ "orderpicker_client", "transport_management" } },
+    { "order_exchange_order_product", new []{ "orderpicker_client" } },
 };
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -42,11 +44,12 @@ builder.Services.AddTransient<IMessageSender, MessageSender>();
 
 // Add framework Services
 builder.Services
-    .AddMvc(options => options.EnableEndpointRouting = false);
+    .AddMvc(options => options.EnableEndpointRouting = false)
+    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
 // Setup MVC
-builder.Services.AddControllers()
-    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+builder.Services.AddControllers();
+    
 
 var app = builder.Build();
 
