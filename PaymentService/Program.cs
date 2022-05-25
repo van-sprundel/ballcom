@@ -16,9 +16,11 @@ builder.Services.AddDbContext<PaymentServiceDbContext>(options =>
 );
 
 // Create connection
+var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
 var connection = new ConnectionFactory
 {
-    HostName = "localhost",
+    HostName = isDevelopment ? "localhost" : "rabbitmq" ,
     Port = 5672,
     UserName = "Rathalos",
     Password = "1234",

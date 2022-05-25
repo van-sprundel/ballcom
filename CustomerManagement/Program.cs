@@ -16,9 +16,11 @@ builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
 //Create connection
-IConnection connection = new ConnectionFactory
+var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+var connection = new ConnectionFactory
 {
-    HostName = "localhost",
+    HostName = isDevelopment ? "localhost" : "rabbitmq" ,
     Port = 5672,
     UserName = "Rathalos",
     Password = "1234",
