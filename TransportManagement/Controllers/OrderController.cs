@@ -99,7 +99,7 @@ public class OrderController : Controller
             await _dbContext.SaveChangesAsync();
             
             // Send event
-            _rmq.Send(new DomainEvent(order, EventType.Updated, "order", true));
+            _rmq.Send(new DomainEvent(order, EventType.Updated, "transport_exchange_order", true));
 
             return StatusCode(StatusCodes.Status202Accepted);
 

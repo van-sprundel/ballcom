@@ -1,6 +1,7 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
+using OrderManagement.Controllers;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
 using RabbitMQ.Client;
@@ -11,10 +12,13 @@ public class OrderMessageReceiver : MessageReceiver
 {
     
     private readonly OrderManagementDbContext _dbContext;
+    private readonly IMessageSender _rmq;
     
-    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext) : base(connection, new[] {"customer", "product", "order", "general"})
+    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext, IMessageSender rmq) : 
+        base(connection, new[] {"order_management"})
     {
         _dbContext = dbContext;
+        _rmq = rmq;
     }
 
     protected override Task HandleMessage(IEvent e)
@@ -35,6 +39,8 @@ public class OrderMessageReceiver : MessageReceiver
 
                         _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();
+                        
+                        _rmq.Send(new DomainEvent(existingOrder, EventType.Updated, "order_exchange_order", true));
                         break;
                     }
                     break;
@@ -96,7 +102,6 @@ public class OrderMessageReceiver : MessageReceiver
                 }
             }
         }
-        
         return Task.CompletedTask;
     }
 }

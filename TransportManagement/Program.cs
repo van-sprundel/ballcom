@@ -27,7 +27,7 @@ builder.Services.AddSingleton(connection);
 // each exchange needs to know which queues it's going to send data to
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "transport_exchange", new []{ "order" } },
+    { "transport_exchange_order", new []{ "order_management" } },
 };
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
