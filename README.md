@@ -93,6 +93,7 @@ Log in met user:pass `root`:`secret`
 
 - Zorg ervoor dat de MariaDb draaiend is in de container.
 - Om te controleren of je entity framework heb, voer de volgende command uit in een powershell window.
+- WORKAROUND VOOR ERROR: Wanneer migrations aangemaakt worden of de database geupdate kan je de error krijgen: "An error occured while accessing the Microsoft.Extension.Hosting services." Als deze error zich voordoet, ga naar program, en plaats alles van rabbitmq in commentaar. Daarna kan je de migrations en database updaten en vervolgens het commentaar weer terugzetten.
 
 ```
 dotnet ef
