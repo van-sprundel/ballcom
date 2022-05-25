@@ -63,20 +63,7 @@ public class OrderController : Controller
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
 
-                //PURE TESTING
-                // Order order2 = new Order
-                // {
-                //     CustomerId = form.CustomerId,
-                //     ArrivalCity = "TESTING",
-                //     ArrivalAdress = "TESTING",
-                //     OrderDate = DateTime.Now,
-                //     StatusProcess = StatusProcess.Pending,
-                //     Price = 900,
-                //     IsPaid = false,
-                //     OrderProducts = new List<OrderProduct>()
-                // };
-                //
-                // _rmq.Send(new DomainEvent(order2, EventType.Created, "order", false));
+                _rmq.Send(new DomainEvent(order, EventType.Created, "order", false));
 
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
@@ -121,6 +108,8 @@ public class OrderController : Controller
                     _dbContext.OrderProduct.Add(orderProduct);
                     _dbContext.Orders.Update(order);
                     await _dbContext.SaveChangesAsync();
+                    
+                    _rmq.Send(new DomainEvent(orderProduct, EventType.Created, "orderProduct", false));
 
                     // return result
                     return Ok();
@@ -160,8 +149,8 @@ public class OrderController : Controller
                 return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
             }
             
-            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
-            if (amountProducts < 1)
+            var orderProducts = _dbContext.OrderProduct.Where(op => op.OrderId == orderNumber);
+            if (!orderProducts.Any())
             {
                 return StatusCode(StatusCodes.Status403Forbidden, "Order needs at least one product");
             }
@@ -171,7 +160,7 @@ public class OrderController : Controller
             await _dbContext.SaveChangesAsync();
             
             // Send event
-            _rmq.Send(new DomainEvent(order, EventType.Created, "order", false));
+            _rmq.Send(new DomainEvent(order, EventType.Updated, "order", false));
 
             return StatusCode(StatusCodes.Status200OK, order);
         }
@@ -203,6 +192,8 @@ public class OrderController : Controller
                 _dbContext.OrderProduct.Remove(orderProduct);
                 _dbContext.Orders.Update(order);
                 await _dbContext.SaveChangesAsync();
+                
+                _rmq.Send(new DomainEvent(orderProduct, EventType.Deleted, "orderProduct", false));
 
                 // return result
                 return StatusCode(StatusCodes.Status204NoContent);

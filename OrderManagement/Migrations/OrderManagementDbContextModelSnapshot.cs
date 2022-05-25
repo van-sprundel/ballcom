@@ -51,7 +51,7 @@ namespace OrderManagement.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsPaid")
+                    b.Property<bool?>("IsPaid")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("OrderDate")
@@ -60,7 +60,7 @@ namespace OrderManagement.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
-                    b.Property<int>("StatusProcess")
+                    b.Property<int?>("StatusProcess")
                         .HasColumnType("int");
 
                     b.HasKey("OrderId");

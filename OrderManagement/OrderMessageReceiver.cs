@@ -1,5 +1,6 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
+using Microsoft.EntityFrameworkCore;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
 using RabbitMQ.Client;
@@ -29,7 +30,10 @@ public class OrderMessageReceiver : MessageReceiver
                     if (de.Type == EventType.Updated)
                     {
                         // Update het order.
-                        _dbContext.Orders.Update(c);
+                        var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderId == c.OrderId);
+                        existingOrder.StatusProcess = c.StatusProcess ?? existingOrder.StatusProcess;
+
+                        _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();
                         break;
                     }

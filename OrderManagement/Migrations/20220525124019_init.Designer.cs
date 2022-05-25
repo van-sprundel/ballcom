@@ -11,8 +11,8 @@ using OrderManagement.DataAccess;
 namespace OrderManagement.Migrations
 {
     [DbContext(typeof(OrderManagementDbContext))]
-    [Migration("20220523180711_getalorderProducts")]
-    partial class getalorderProducts
+    [Migration("20220525124019_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,7 +53,7 @@ namespace OrderManagement.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsPaid")
+                    b.Property<bool?>("IsPaid")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("OrderDate")
@@ -62,7 +62,7 @@ namespace OrderManagement.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
-                    b.Property<int>("StatusProcess")
+                    b.Property<int?>("StatusProcess")
                         .HasColumnType("int");
 
                     b.HasKey("OrderId");
@@ -90,7 +90,7 @@ namespace OrderManagement.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderProducts");
+                    b.ToTable("OrderProduct");
                 });
 
             modelBuilder.Entity("OrderManagement.Models.Product", b =>
@@ -114,25 +114,10 @@ namespace OrderManagement.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.Property<int>("OrdersOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductsProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrdersOrderId", "ProductsProductId");
-
-                    b.HasIndex("ProductsProductId");
-
-                    b.ToTable("OrderProduct");
-                });
-
             modelBuilder.Entity("OrderManagement.Models.Order", b =>
                 {
                     b.HasOne("OrderManagement.Models.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -143,13 +128,13 @@ namespace OrderManagement.Migrations
             modelBuilder.Entity("OrderManagement.Models.OrderProduct", b =>
                 {
                     b.HasOne("OrderManagement.Models.Order", "Order")
-                        .WithMany()
+                        .WithMany("OrderProducts")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OrderManagement.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("OrderProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -159,19 +144,19 @@ namespace OrderManagement.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
+            modelBuilder.Entity("OrderManagement.Models.Customer", b =>
                 {
-                    b.HasOne("OrderManagement.Models.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Orders");
+                });
 
-                    b.HasOne("OrderManagement.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("OrderManagement.Models.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
+                });
+
+            modelBuilder.Entity("OrderManagement.Models.Product", b =>
+                {
+                    b.Navigation("OrderProducts");
                 });
 #pragma warning restore 612, 618
         }
