@@ -1,6 +1,3 @@
-using BallCore.Enums;
-using BallCore.Events;
-using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Orderpicker.DataAccess;
@@ -11,7 +8,7 @@ namespace Orderpicker.Controllers;
 [Route("/api/[controller]")]
 public class OrderpickerController : Controller
 {
-    private readonly OrderManagementDbContext _dbContext;
+    private readonly OrderpickerDbContext _dbContext;
 
     public OrderpickerController(OrderpickerDbContext dbContext)
     {
@@ -34,7 +31,6 @@ public class OrderpickerController : Controller
             return NotFound();
         }
 
-        order.Products = _dbContext.Product.Where(o => o.OrderId == orderId).ToList();
         return Ok(order);
     }
 
@@ -48,7 +44,6 @@ public class OrderpickerController : Controller
             return NotFound();
         }
 
-        product.Orders = _dbContext.Orders.Where(p => p.ProductId == productId).ToList();
         return Ok(product);
     }
 

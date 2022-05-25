@@ -43,7 +43,7 @@ public class SupplierController : Controller
     {
         var supplier = await _dbContext
             .Set<Supplier>()
-            .FirstOrDefaultAsync(c => c.SupplierId == id);
+            .FirstOrDefaultAsync(c => c.SupplierId == supplierId);
 
         if (supplier == null)
         {
