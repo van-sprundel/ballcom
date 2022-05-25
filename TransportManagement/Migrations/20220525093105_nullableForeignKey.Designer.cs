@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransportManagement.DataAccess;
 
@@ -10,9 +11,10 @@ using TransportManagement.DataAccess;
 namespace TransportManagement.Migrations
 {
     [DbContext(typeof(TransportManagementDbContext))]
-    partial class TransportManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220525093105_nullableForeignKey")]
+    partial class nullableForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

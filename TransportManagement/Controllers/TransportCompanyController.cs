@@ -33,6 +33,18 @@ public class TransportCompanyController : Controller
         return Ok(transportCompany);
     }
 
+    [HttpGet]
+    [Route("lowestPrice", Name = "GetLowestPrice")]
+    public async Task<IActionResult> GetLowestPrice()
+    {
+        var transportCompany = await _dbContext.TransportCompanies.OrderBy(tc => tc.PricePerKm).FirstOrDefaultAsync();
+        if (transportCompany == null)
+        {
+            return NotFound();
+        }
+        return Ok(transportCompany);
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddTransportCompany([FromBody] TransportCompany form)
     {

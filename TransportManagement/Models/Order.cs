@@ -1,4 +1,6 @@
-﻿namespace TransportManagement.Models;
+﻿using BallCore.Enums;
+
+namespace TransportManagement.Models;
 
 public class Order
 {
@@ -7,6 +9,6 @@ public class Order
     public string ArrivalAdress { get; set; }
     public StatusProcess StatusProcess { get; set; }
 
-    public int TransportCompanyId { get; set; }
-    public TransportCompany TransportCompany { get; set; }
+    public int? TransportCompanyId { get; set; }
+    public TransportCompany? TransportCompany { get; set; }
 }
