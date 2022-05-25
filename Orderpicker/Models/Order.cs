@@ -1,4 +1,6 @@
-﻿using BallCore.Enums;
+﻿
+using BallCore.Enums;
+
 namespace Orderpicker.Models;
 
 public class Order
