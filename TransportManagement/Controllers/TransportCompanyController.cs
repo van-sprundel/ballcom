@@ -63,9 +63,7 @@ public class TransportCompanyController : Controller
             // insert transportCompany
             _dbContext.TransportCompanies.Add(transportCompany);
             await _dbContext.SaveChangesAsync();
-            
-            //TODO: Send event???
-            
+
             //return result
             return CreatedAtRoute("GetByCompanyId", new { companyId = transportCompany.TransportCompanyId },
                 transportCompany);

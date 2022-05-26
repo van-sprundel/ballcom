@@ -16,9 +16,11 @@ builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
 //Create connection
-IConnection connection = new ConnectionFactory
+var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+var connection = new ConnectionFactory
 {
-    HostName = "rabbitmq",
+    HostName = isDevelopment ? "localhost" : "rabbitmq" ,
     Port = 5672,
     UserName = "Rathalos",
     Password = "1234",
@@ -30,7 +32,7 @@ builder.Services.AddSingleton(connection);
 //Inject ExchangeDeclarator
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "customer_exchange", new [] { "general" } }
+    { "customer_exchange", new [] { "payment", "servicedesk", "notifications", "order_management" } }
 };
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -62,6 +64,19 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World suppliermanagement!");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<CustomerManagementDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
+
+
 
 Console.WriteLine("Starting application");
 app.Run();

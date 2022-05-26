@@ -10,7 +10,7 @@ public class PaymentController : Controller
     private readonly PaymentServiceDbContext _dbContext;
     private readonly IMessageSender _rmq;
 
-    public PaymentController(IMessageSender rmq,PaymentServiceDbContext dbContext)
+    public PaymentController(IMessageSender rmq, PaymentServiceDbContext dbContext)
     {
         _dbContext = dbContext;
         _rmq = rmq;
@@ -23,38 +23,28 @@ public class PaymentController : Controller
         return await Task.FromResult(Ok("test"));
     }
 
-    [HttpGet]
-    [Route("api/order/{orderId}")]
-    public async Task<IActionResult> GetOrder(int orderId)
-    {
-        var order = await _dbContext.Orders.FindAsync(orderId);
-        if (order == null)
-        {
-            return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
-        }
-        return await Task.FromResult(Ok(order));
-    }
-    
     [HttpPost]
-    [Route("api/order/{orderId}")]
+    [Route("api/order/{orderId}/pay")]
     public async Task<IActionResult> PayOrder(int orderId)
     {
         var order = await _dbContext.Orders.FindAsync(orderId);
+        
         if (order == null)
         {
             return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
         }
 
-        if (!order.isPaid)
+        if (order.IsPaid)
         {
-            order.isPaid = true;
-            _dbContext.Orders.Update(order);
-            await _dbContext.SaveChangesAsync();
-
-            //Send domain event to broker
-            _rmq.Send(new DomainEvent(order, EventType.Updated, "payment_exchange",true));
+            return await Task.FromResult(new StatusCodeResult(304));
         }
+
+        order.IsPaid = true;
+        _dbContext.Orders.Update(order);
+        await _dbContext.SaveChangesAsync();
         
-        return await Task.FromResult(Ok(order));
+        //TODO create invoice
+
+        return await Task.FromResult(new OkObjectResult(order));
     }
 }

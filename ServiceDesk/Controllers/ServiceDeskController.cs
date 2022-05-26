@@ -1,168 +1,250 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BallCore.Events;
+using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ServiceDesk.DataAccess;
 using ServiceDesk.Models;
 
 namespace ServiceDesk.Controllers;
-    [Route("/api/[controller]")]
-    public class ServiceDeskController : Controller
+[Route("/api/[controller]")]
+public class ServiceDeskController : Controller
+{
+    ServiceDeskDbContext _dbContext;
+    IMessageSender _messageSender;
+
+    public ServiceDeskController(ServiceDeskDbContext dbContext, IMessageSender messageSender)
     {
-        ServiceDeskDbContext _dbContext;
+        _dbContext = dbContext;
+        _messageSender = messageSender;
+    }
 
-        public ServiceDeskController(ServiceDeskDbContext dbContext)
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        var tickets = await _dbContext.Set<Ticket>()
+        .Include(c => c.Customer)
+        .Select(
+            x => new TicketViewModel
+            {
+                TicketId = x.TicketId,
+                TicketText = x.TicketText,
+                Status = x.Status,
+                CustomerId = x.CustomerId,
+                Customer = x.Customer
+            }).ToListAsync();
+
+        return Ok(tickets);
+    }
+
+    [HttpGet]
+    [Route("open")]
+    public async Task<IActionResult> GetAllOpenAsync()
+    {
+        var tickets = await _dbContext.Set<Ticket>()
+        .Include(c => c.Customer)
+        .Where(x => x.Status == Status.Open)
+        .Select(
+            x => new TicketViewModel
+            {
+                TicketId = x.TicketId,
+                TicketText = x.TicketText,
+                Status = x.Status,
+                CustomerId = x.CustomerId,
+                Customer = x.Customer
+            }).ToListAsync();
+
+        return Ok(tickets);
+    }
+
+    [HttpGet]
+    [Route("closed")]
+    public async Task<IActionResult> GetAllClosedAsync()
+    {
+        var tickets = await _dbContext.Set<Ticket>()
+        .Include(c => c.Customer)
+        .Where(x => x.Status == Status.Closed)
+        .Select(
+            x => new TicketViewModel
+            {
+                TicketId = x.TicketId,
+                TicketText = x.TicketText,
+                Status = x.Status,
+                CustomerId = x.CustomerId,
+                Customer = x.Customer
+            }).ToListAsync();
+
+        return Ok(tickets);
+    }
+
+    [HttpGet]
+    [Route("solved")]
+    public async Task<IActionResult> GetAllSolvedAsync()
+    {
+        var tickets = await _dbContext.Set<Ticket>()
+        .Include(c => c.Customer)
+        .Where(x => x.Status == Status.Solved)
+        .Select(
+            x => new TicketViewModel
+            {
+                TicketId = x.TicketId,
+                TicketText = x.TicketText,
+                Status = x.Status,
+                CustomerId = x.CustomerId,
+                Customer = x.Customer
+            }).ToListAsync();
+
+        return Ok(tickets);
+    }
+
+    [HttpGet]
+    [Route("pending")]
+    public async Task<IActionResult> GetAllPendingAsync()
+    {
+        var tickets = await _dbContext.Set<Ticket>()
+        .Include(c => c.Customer)
+        .Where(x => x.Status == Status.Pending)
+        .Select(
+            x => new TicketViewModel
+            {
+                TicketId = x.TicketId,
+                TicketText = x.TicketText,
+                Status = x.Status,
+                CustomerId = x.CustomerId,
+                Customer = x.Customer
+            }).ToListAsync();
+
+        return Ok(tickets);
+    }
+
+    [HttpGet]
+    [Route("{id}", Name = "GetByTicketId")]
+    public async Task<IActionResult> GetAsync(int id)
+    {
+        var ticket = await _dbContext
+            .Set<Ticket>()
+            .FirstOrDefaultAsync(c => c.TicketId == id);
+            
+        if (ticket == null)
         {
-            _dbContext = dbContext;
+            return NotFound("Couldn't find ticket");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        return Ok(new TicketViewModel
         {
-            var tickets = await _dbContext.Set<Ticket>()
-            .Include(c => c.Customer)
-            .Select(
-                x => new TicketViewModel
+            TicketId = ticket.TicketId,
+            TicketText = ticket.TicketText,
+            Status = ticket.Status,
+            CustomerId = ticket.CustomerId,
+            Customer = ticket.Customer
+        });
+    }
+
+    [HttpDelete]
+    [Route("delete/{id}", Name = "Delete Ticket")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        var ticket = await _dbContext
+            .Set<Ticket>()
+            .FirstOrDefaultAsync(c => c.TicketId == id);
+            
+        if (ticket == null)
+        {
+            return NotFound("Couldn't find ticket");
+        }
+
+        _dbContext.Set<Ticket>().Remove(ticket);
+        await _dbContext.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route("create")]
+    public async Task<IActionResult> Create([FromBody] TicketCreateForm form)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                var ticket = new Ticket
                 {
-                    TicketId = x.TicketId,
-                    TicketText = x.TicketText,
-                    Status = x.Status,
-                    CustomerId = x.CustomerId,
-                    Customer = x.Customer
-                }).ToListAsync();
+                    TicketText = form.TicketText,
+                    CustomerId = form.CustomerId,
+                    Status = form.Status,
+                };
 
-            return Ok(tickets);
-        }
-
-        [HttpGet]
-        [Route("{id}", Name = "GetByTicketId")]
-        public async Task<IActionResult> GetAsync(int id)
-        {
-            var ticket = await _dbContext
-                .Set<Ticket>()
-                .FirstOrDefaultAsync(c => c.TicketId == id);
-                
-            if (ticket == null)
-            {
-                return NotFound("Couldn't find ticket");
-            }
-
-            return Ok(new TicketViewModel
-            {
-                TicketId = ticket.TicketId,
-                TicketText = ticket.TicketText,
-                Status = ticket.Status,
-                CustomerId = ticket.CustomerId,
-                Customer = ticket.Customer
-            });
-        }
-
-        [HttpDelete]
-        [Route("delete/{id}", Name = "Delete Ticket")]
-        public async Task<IActionResult> DeleteAsync(int id)
-        {
-            var ticket = await _dbContext
-                .Set<Ticket>()
-                .FirstOrDefaultAsync(c => c.TicketId == id);
-                
-            if (ticket == null)
-            {
-                return NotFound("Couldn't find ticket");
-            }
-
-            _dbContext.Set<Ticket>().Remove(ticket);
-            await _dbContext.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        [HttpPost]
-        [Route("create")]
-        public async Task<IActionResult> Create([FromBody] TicketCreateForm form)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var ticket = new Ticket
-                    {
-                        TicketText = form.TicketText,
-                        CustomerId = form.CustomerId,
-                        Status = form.Status,
-                    };
-
-                    // insert customer
-                    await _dbContext
-                        .Set<Ticket>()
-                        .AddAsync(ticket);
-                    
-                    await _dbContext.SaveChangesAsync();
-
-                    //TODO: send event
-
-                    // return result
-                    return Ok(new TicketViewModel
-                    {
-                        TicketId = ticket.TicketId,
-                        TicketText = ticket.TicketText,
-                        Status = ticket.Status,
-                        CustomerId = ticket.CustomerId
-                    });
-                }
-
-                return BadRequest();
-            }
-            catch (DbUpdateException)
-            {
-                ModelState.AddModelError("", "Unable to save changes. ");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
-            }
-        }
-
-        [HttpPost]
-        [Route("update")]
-        public async Task<IActionResult> Update([FromBody] TicketUpdateForm form)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    var ticket = await _dbContext
+                // insert customer
+                await _dbContext
                     .Set<Ticket>()
-                    .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
+                    .AddAsync(ticket);
+                
+                await _dbContext.SaveChangesAsync();
 
-                    if (ticket == null) {
-                        return NotFound("Couldn't find ticket");
-                    }
-                    
-                    ticket.Status = form.Status;
-
-                    // Check if ticket is solved
-                    if(ticket.Status == Status.Solved) {
-                        //Send message to customer
-                    }
-
-                    _dbContext
-                    .Set<Ticket>()
-                    .Update(ticket);
-                    
-                    await _dbContext.SaveChangesAsync();
-
-                    //TODO: send event
-
-                    // return result
-                    return CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
-                }
-
-                return BadRequest();
+                return Ok(new TicketViewModel
+                {
+                    TicketId = ticket.TicketId,
+                    TicketText = ticket.TicketText,
+                    Status = ticket.Status,
+                    CustomerId = ticket.CustomerId
+                });
             }
-            catch (DbUpdateException)
-            {
-                ModelState.AddModelError("", "Unable to save changes. ");
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                throw;
-            }
+
+            return BadRequest();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes. ");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+            throw;
         }
     }
+
+    [HttpPost]
+    [Route("update")]
+    public async Task<IActionResult> Update([FromBody] TicketUpdateForm form)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                var ticket = await _dbContext
+                .Set<Ticket>()
+                .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
+
+                if (ticket == null) {
+                    return NotFound("Couldn't find ticket");
+                }
+                
+                ticket.Status = form.Status;
+
+                // Check if ticket is solved
+                if(ticket.Status == Status.Solved) {
+                    //Send message to customer
+                }
+
+                _dbContext
+                .Set<Ticket>()
+                .Update(ticket);
+                
+                await _dbContext.SaveChangesAsync();
+
+                //TODO: send event
+                this._messageSender.Send(new DomainEvent(ticket, EventType.Updated, "notifications", false));
+
+                // return result
+                return CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
+            }
+
+            return BadRequest();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes. ");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+            throw;
+        }
+    }
+}

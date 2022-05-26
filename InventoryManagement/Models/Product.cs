@@ -1,6 +1,8 @@
-﻿namespace InventoryManagement.Models;
+﻿using BallCore;
 
-public class Product
+namespace InventoryManagement.Models;
+
+public class Product : IDomainModel
 {
     public int ProductId { get; set; }
     public string Name { get; set; }

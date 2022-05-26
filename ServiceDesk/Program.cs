@@ -1,4 +1,7 @@
+using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
+using ServiceDesk;
 using ServiceDesk.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +10,32 @@ var builder = WebApplication.CreateBuilder(args);
 var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDbConnectionString");
 builder.Services.AddDbContext<ServiceDeskDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
+
+var connection = new ConnectionFactory
+{
+    HostName = "rabbitmq",
+    Port = 5672,
+    UserName = "Rathalos",
+    Password = "1234",
+    DispatchConsumersAsync = true
+}.CreateConnection();
+
+builder.Services.AddSingleton(connection);
+
+// create exchange factory
+// each exchange needs to know which queues it's going to send data to
+var exchanges = new Dictionary<string, IEnumerable<string>>
+{
+    { "order_exchange", new []{ "order" } },
+};
+
+builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+
+//Inject receivers
+builder.Services.AddHostedService<ServiceDeskMessageReceiver>();
+
+//Inject sender
+builder.Services.AddTransient<IMessageSender, MessageSender>();
 
 builder.Services.AddControllers();
 

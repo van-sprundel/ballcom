@@ -2,6 +2,11 @@
 
 ## Instructies voor Developers
 
+### Migrations
+
+Omdat projecten nu afhankelijk zijn van rabbitmq, zullen database updates falen.\
+Je zal met `docker-compose up rabbitmq` in de achtergrond migrations moeten doen.\
+Ook is de HostName voor nu `localhost`, omdat deze service nu nergens online draait.
 ### Broker
 
 Om services aan de broker toe te voegen moet je deze in `Program.cs` definiëren.\
@@ -93,6 +98,7 @@ Log in met user:pass `root`:`secret`
 
 - Zorg ervoor dat de MariaDb draaiend is in de container.
 - Om te controleren of je entity framework heb, voer de volgende command uit in een powershell window.
+- WORKAROUND VOOR ERROR: Wanneer migrations aangemaakt worden of de database geupdate kan je de error krijgen: "An error occured while accessing the Microsoft.Extension.Hosting services." Als deze error zich voordoet, ga naar program, en plaats alles van rabbitmq in commentaar. Daarna kan je de migrations en database updaten en vervolgens het commentaar weer terugzetten.
 
 ```
 dotnet ef
