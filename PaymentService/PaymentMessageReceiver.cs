@@ -25,26 +25,41 @@ public class PaymentMessageReceiver : MessageReceiver
         Console.WriteLine("Received message");
         switch (e)
         {
-            case DomainEvent { Payload: Customer customer } de:
+            case DomainEvent { Payload: Customer c } de:
             {
-                switch (de.Type)
+                if (de.Type == EventType.Created)
                 {
-                    case EventType.Created:
+                    var customer = new Customer()
                     {
-                        _paymentServiceDbContext.Customers.Add(customer);
+                        Email = c.Email,
+                        CustomerId = c.CustomerId,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName
+                    };
+                    _paymentServiceDbContext.Customers.Add(customer);
+                }
+                else if (de.Type == EventType.Updated)
+                {
+                    var customer =
+                        _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
+                    if (customer == null)
+                    {
                         break;
                     }
-                    case EventType.Updated:
-                    {
-                        _paymentServiceDbContext.Customers.Update(customer);
-                        _paymentServiceDbContext.SaveChanges();
-                        break;
-                    }
-                    case EventType.Deleted:
 
-                        _paymentServiceDbContext.Customers.Remove(customer);
-                        _paymentServiceDbContext.SaveChanges();
+                    _paymentServiceDbContext.Customers.Update(customer);
+                    _paymentServiceDbContext.SaveChanges();
+                }
+                else if (de.Type == EventType.Deleted)
+                {
+                    var customer = _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
+                    if (customer == null)
+                    {
                         break;
+                    }
+
+                    _paymentServiceDbContext.Customers.Remove(customer);
+                    _paymentServiceDbContext.SaveChanges();
                 }
 
                 break;
@@ -85,7 +100,7 @@ public class PaymentMessageReceiver : MessageReceiver
                 //         "orderpicker"
                 //     ));
                 // }
-                
+
                 if (de.Destination == "transportmanagement_exchange" &&
                     de.Type == EventType.Updated &&
                     order.StatusProcess == StatusProcess.Arrived &&
@@ -94,6 +109,7 @@ public class PaymentMessageReceiver : MessageReceiver
                     //send notification to notificationservice so customer gets an email
                     _messageSender.Send(new DomainEvent(order, EventType.Updated, "notificationservice"));
                 }
+
                 break;
             }
         }

@@ -10,12 +10,11 @@ namespace OrderManagement;
 
 public class OrderMessageReceiver : MessageReceiver
 {
-    
     private readonly OrderManagementDbContext _dbContext;
     private readonly IMessageSender _rmq;
-    
-    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext, IMessageSender rmq) : 
-        base(connection, new[] {"order_management"})
+
+    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext, IMessageSender rmq) :
+        base(connection, new[] { "order_management" })
     {
         _dbContext = dbContext;
         _rmq = rmq;
@@ -30,7 +29,8 @@ public class OrderMessageReceiver : MessageReceiver
             {
                 case Order c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
                     if (de.Type == EventType.Updated)
                     {
                         // Update het order.
@@ -39,19 +39,26 @@ public class OrderMessageReceiver : MessageReceiver
 
                         _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();
-                        
+
                         _rmq.Send(new DomainEvent(existingOrder, EventType.Updated, "order_exchange_order", true));
-                        break;
                     }
+
                     break;
                 }
-                
+
                 case Customer c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
                     if (de.Type == EventType.Created)
                     {
-                        _dbContext.Customers.Add(c);
+                        var customer = new Customer()
+                        {
+                            CustomerId = c.CustomerId,
+                            Email = c.Email,
+                            Orders = c.Orders,
+                        };
+                        _dbContext.Customers.Add(customer);
                         _dbContext.SaveChanges();
                         break;
                     }
@@ -69,12 +76,14 @@ public class OrderMessageReceiver : MessageReceiver
                         _dbContext.SaveChanges();
                         break;
                     }
+
                     break;
                 }
-                
+
                 case Product c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
                     if (de.Type == EventType.Created)
                     {
                         // Add het product toe.
@@ -98,10 +107,12 @@ public class OrderMessageReceiver : MessageReceiver
                         _dbContext.SaveChangesAsync();
                         break;
                     }
+
                     break;
                 }
             }
         }
+
         return Task.CompletedTask;
     }
 }

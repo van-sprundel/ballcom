@@ -13,28 +13,30 @@ builder.Services.AddDbContext<SupplierManagementDbContext>(options =>
 
 //Create connection
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-
-var connection = new ConnectionFactory
+if (!isDevelopment)
 {
-    HostName = isDevelopment ? "localhost" : "rabbitmq",
-    Port = 5672,
-    UserName = "Rathalos",
-    Password = "1234",
-    DispatchConsumersAsync = true
-}.CreateConnection();
+    var connection = new ConnectionFactory
+    {
+        HostName = isDevelopment ? "localhost" : "rabbitmq",
+        Port = 5672,
+        UserName = "Rathalos",
+        Password = "1234",
+        DispatchConsumersAsync = true
+    }.CreateConnection();
 
-builder.Services.AddSingleton(connection);
+    builder.Services.AddSingleton(connection);
 
 //Inject ExchangeDeclarator
-var exchanges = new Dictionary<string, IEnumerable<string>>
-{
-    { "supplier_exchange", new [] { "inventory_management", "general" } }
-};
+    var exchanges = new Dictionary<string, IEnumerable<string>>
+    {
+        { "supplier_exchange", new [] { "inventory_management", "general" } }
+    };
 
-builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+    builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
 //Inject sender
-builder.Services.AddTransient<IMessageSender, MessageSender>();
+    builder.Services.AddTransient<IMessageSender, MessageSender>();
+}
 
 // Add framework services
 builder.Services

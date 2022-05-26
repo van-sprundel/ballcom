@@ -13,34 +13,39 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<OrderManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
-// Create connection
-var connection = new ConnectionFactory
-{
-    HostName = "rabbitmq",
-    Port = 5672,
-    UserName = "Rathalos",
-    Password = "1234",
-    DispatchConsumersAsync = true
-}.CreateConnection();
+var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
-builder.Services.AddSingleton(connection);
+if (!isDevelopment)
+{
+    // Create connection
+    var connection = new ConnectionFactory
+    {
+        HostName = "rabbitmq",
+        Port = 5672,
+        UserName = "Rathalos",
+        Password = "1234",
+        DispatchConsumersAsync = true
+    }.CreateConnection();
+
+    builder.Services.AddSingleton(connection);
 
 // create exchange factory
 // each exchange needs to know which queues it's going to send data to
-var exchanges = new Dictionary<string, IEnumerable<string>>
-{
-    { "order_exchange_order", new []{ "orderpicker_client", "transport_management","payment","notifications" } },
-    { "order_exchange_order_product", new []{ "orderpicker_client" } },
-};
+    var exchanges = new Dictionary<string, IEnumerable<string>>
+    {
+        { "order_exchange_order", new []{ "orderpicker_client", "transport_management","payment","notifications" } },
+        { "order_exchange_order_product", new []{ "orderpicker_client" } },
+    };
 
-builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+    builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
 //Inject receivers
-builder.Services.AddHostedService<OrderMessageReceiver>();
+    builder.Services.AddHostedService<OrderMessageReceiver>();
 
 //Inject sender
-builder.Services.AddTransient<IMessageSender, MessageSender>();
+    builder.Services.AddTransient<IMessageSender, MessageSender>();
 
+}
 
 // Add framework Services
 builder.Services
