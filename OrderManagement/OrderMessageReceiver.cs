@@ -55,8 +55,7 @@ public class OrderMessageReceiver : MessageReceiver
                         var customer = new Customer()
                         {
                             CustomerId = c.CustomerId,
-                            Email = c.Email,
-                            Orders = c.Orders,
+                            Email = c.Email
                         };
                         _dbContext.Customers.Add(customer);
                         _dbContext.SaveChanges();
@@ -65,14 +64,21 @@ public class OrderMessageReceiver : MessageReceiver
 
                     if (de.Type == EventType.Deleted)
                     {
-                        _dbContext.Customers.Remove(c);
+                        var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                        if (customer == null) break;
+                        
+                        _dbContext.Customers.Remove(customer);
                         _dbContext.SaveChanges();
                         break;
                     }
 
                     if (de.Type == EventType.Updated)
                     {
-                        _dbContext.Customers.Update(c);
+                        var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                        if (customer == null) break;
+                        
+                        customer.Email = c.Email;
+                        _dbContext.Customers.Update(customer);
                         _dbContext.SaveChanges();
                         break;
                     }

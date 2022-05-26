@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BallCore.RabbitMq;
 using BallCore.Events;
+using Microsoft.AspNetCore.Server.HttpSys;
 
 namespace CustomerManagement.Controllers;
 
@@ -63,15 +64,42 @@ public class CustomersController : Controller
     [Route("delete/{id}", Name = "Delete customer")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        var customer = await _dbContext
-            .Set<Customer>()
-            .FirstOrDefaultAsync(c => c.CustomerId == id);
-
+        var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.CustomerId == id);
         if (customer == null)
         {
             return NotFound("Couldn't find customer");
         }
+
+        _dbContext.Customers.Remove(customer);
+        await _dbContext.SaveChangesAsync();
+        
+        _messageSender.Send(new DomainEvent(customer, EventType.Deleted, "customer_exchange", true));
+        return StatusCode(StatusCodes.Status204NoContent);
+    }
+
+    [HttpPut]
+    [Route("{customerId}", Name = "UpdateCustomer")]
+    public async Task<IActionResult> UpdateCustomer([FromBody] UpdateCustomerForm form,int customerId)
+    {
+        var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+        if (customer == null)
+        {
+            return NotFound("Could not find customer.");
+        }
+
+        customer.FirstName = form.FirstName;
+        customer.LastName = form.LastName;
+        customer.Email = form.Email;
+        customer.Address = form.Address;
+        customer.City = form.City;
+            
+        _dbContext.Customers.Update(customer);
+        await _dbContext.SaveChangesAsync();
+        
+        _messageSender.Send(new DomainEvent(customer, EventType.Updated, "customer_exchange", true));
+
         return Ok(customer);
+
     }
 
     [AllowAnonymous]
@@ -95,8 +123,7 @@ public class CustomersController : Controller
                 // insert customer
                 _dbContext.Customers.Add(customer);
                 await _dbContext.SaveChangesAsync();
-
-                //TODO: send event
+                
                 _messageSender.Send(new DomainEvent(customer, EventType.Created, "customer_exchange", true));
                 // return result
                 return CreatedAtRoute("GetByCustomerId", new { customerId = customer.CustomerId }, customer);
