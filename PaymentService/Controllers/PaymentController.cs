@@ -44,6 +44,7 @@ public class PaymentController : Controller
         await _dbContext.SaveChangesAsync();
         
         //TODO create invoice
+        _rmq.Send(new DomainEvent(order,EventType.Updated,"order_paid_exchange",true));
 
         return await Task.FromResult(new OkObjectResult(order));
     }

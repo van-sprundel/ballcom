@@ -11,32 +11,36 @@ var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDb
 builder.Services.AddDbContext<TransportManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
 
-// Create connection
-var connection = new ConnectionFactory
+var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+if (!isDevelopment)
 {
-    HostName = "rabbitmq",
-    Port = 5672,
-    UserName = "Rathalos",
-    Password = "1234",
-    DispatchConsumersAsync = true
-}.CreateConnection();
+    // Create connection
+    var connection = new ConnectionFactory
+    {
+        HostName = "rabbitmq",
+        Port = 5672,
+        UserName = "Rathalos",
+        Password = "1234",
+        DispatchConsumersAsync = true
+    }.CreateConnection();
 
-builder.Services.AddSingleton(connection);
+    builder.Services.AddSingleton(connection);
 
 // create exchange factory
 // each exchange needs to know which queues it's going to send data to
-var exchanges = new Dictionary<string, IEnumerable<string>>
-{
-    { "transport_exchange_order", new []{ "order_management" } },
-};
+    var exchanges = new Dictionary<string, IEnumerable<string>>
+    {
+        { "transport_exchange_order", new[] { "order_management" } },
+    };
 
-builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+    builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
 //Inject receivers
-builder.Services.AddHostedService<TransportMessageReceiver>();
+    builder.Services.AddHostedService<TransportMessageReceiver>();
 
 //Inject sender
-builder.Services.AddTransient<IMessageSender, MessageSender>();
+    builder.Services.AddTransient<IMessageSender, MessageSender>();
+}
 
 // Add framework services
 builder.Services

@@ -14,30 +14,33 @@ builder.Services.AddDbContext<InventoryManagementDbContext>(options =>
 //Create connection
 var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
-var connection = new ConnectionFactory
+if (!isDevelopment)
 {
-    HostName = isDevelopment ? "localhost" : "rabbitmq",
-    Port = 5672,
-    UserName = "Rathalos",
-    Password = "1234",
-    DispatchConsumersAsync = true
-}.CreateConnection();
+    var connection = new ConnectionFactory
+    {
+        HostName = "rabbitmq",
+        Port = 5672,
+        UserName = "Rathalos",
+        Password = "1234",
+        DispatchConsumersAsync = true
+    }.CreateConnection();
 
-builder.Services.AddSingleton(connection);
+    builder.Services.AddSingleton(connection);
 
 //Inject ExchangeDeclarator
-var exchanges = new Dictionary<string, IEnumerable<string>>
-{
-    { "inventory_exchange", new [] { "orderpicker_client", "order_management" } }
-};
+    var exchanges = new Dictionary<string, IEnumerable<string>>
+    {
+        { "inventory_exchange", new [] { "orderpicker_client", "order_management" } }
+    };
 
-builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
+    builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
 
 //Inject receiver
-builder.Services.AddHostedService<InventoryMessageReceiver>();
+    builder.Services.AddHostedService<InventoryMessageReceiver>();
 
 //Inject sender
-builder.Services.AddTransient<IMessageSender, MessageSender>();
+    builder.Services.AddTransient<IMessageSender, MessageSender>();
+}
 
 // Add framework services
 builder.Services

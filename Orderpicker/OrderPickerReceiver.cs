@@ -10,7 +10,8 @@ public class OrderPickerReceiver : MessageReceiver
 {
     private readonly OrderpickerDbContext _dbContext;
 
-    public OrderPickerReceiver(OrderpickerDbContext dbContext, IConnection connection) : base(connection, new[] { "orderpicker_client", "general"})
+    public OrderPickerReceiver(OrderpickerDbContext dbContext, IConnection connection) : base(connection,
+        new[] { "orderpicker_client", "general" })
     {
         this._dbContext = dbContext;
     }
@@ -26,19 +27,29 @@ public class OrderPickerReceiver : MessageReceiver
             {
                 case Product c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+                    if (de.Type == EventType.Created)
+                    {
                         this._dbContext.Set<Product>().Add(c);
+                    }
+
                     break;
                 }
                 case Order o:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination}");
+                    if (de.Type == EventType.Created)
+                    {
                         this._dbContext.Set<Order>().Add(o);
+                    }
+
                     break;
                 }
             }
         }
-        
+
         return Task.CompletedTask;
     }
 }
