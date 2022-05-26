@@ -77,4 +77,22 @@ public class OrderpickerController : Controller
 
         return this.Ok();
     }
+
+    [HttpPost]
+    [Route("update-product")]
+    public async Task<IActionResult> UpdateOrderProductStatus(OrderUpdateform form)
+    {
+        var orderProduct = await this._dbContext.Set<OrderProduct>().FirstOrDefaultAsync(x => x.Id == form.Id);
+
+        if (orderProduct == null)
+        {
+            return this.NotFound();
+        }
+
+        orderProduct.isPicked = true;
+
+        this._dbContext.Set<OrderProduct>().Update(orderProduct);
+
+        return this.Ok();
+    }
 }
