@@ -17,76 +17,64 @@ public class OrderpickerController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    [Route("orders")]
+    public async Task<IActionResult> GetOrdersAsync()
     {
-        return Ok(await _dbContext.Orders.ToListAsync());
+        var orders = await _dbContext.Set<Order>().ToListAsync();
+
+        return Ok(orders);
     }
 
     [HttpGet]
-    [Route("{orderId}", Name = "GetByOrderId")]
-    public async Task<IActionResult> GetByOrderId(int orderId)
+    [Route("{id}", Name = "GetByOrderId")]
+    public async Task<IActionResult> GetOrderAsync(int id)
     {
-        var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+        var order = await _dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == id);
         if (order == null)
         {
             return NotFound();
         }
-        order.OrderProducts = _dbContext.OrderProducts.Where(op => op.OrderId == orderId).ToList();
+
         return Ok(order);
     }
 
-    [HttpPost]
-    [Route("{orderNumber}/{productNumber}", Name = "AddProductToOrder")]
-    public async Task<IActionResult> AddProductToOrderAsync(int orderNumber, int productNumber)
+    [HttpGet]
+    [Route("products")]
+    public async Task<IActionResult> GetProductsAsync()
     {
-        try
-        {
-            int amountProducts = _dbContext.OrderProducts.Count(op => op.OrderId == orderNumber);
-            if (amountProducts < 20)
-            {
-                var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
-                var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
-                if (product != null && order != null)
-                {
-                    if (order.OrderStatus != StatusProcess.Pending)
-                    {
-                        return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
-                    }
-                    if (product.Quantity < 1)
-                    {
-                        return StatusCode(StatusCodes.Status410Gone, "Order is out of stock");
-                    }
-                    OrderProduct orderProduct = new OrderProduct
-                    {
-                        OrderId = orderNumber,
-                        ProductId = productNumber
-                    };
-                    order.OrderStatus = StatusProcess.Collecting;
-                    // Insert
-                    _dbContext.OrderProducts.Add(orderProduct);
-                    _dbContext.Orders.Update(order);
-                    await _dbContext.SaveChangesAsync();
+        var products = await _dbContext.Set<Product>().ToListAsync();
 
-                    // return result
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, "ProductNumber or OrderNumber could not be found.");
-                }
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status412PreconditionFailed, "This order already contains 20 products, more are not allowed.");
-
-            }
-
-        }
-        catch (DbUpdateException)
-        {
-            ModelState.AddModelError("", "Unable to save changes.");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+        return Ok(products);
     }
 
+    [HttpGet]
+    [Route("{id}", Name = "GetByProductId")]
+    public async Task<IActionResult> GetProductAsync(int id)
+    {
+        var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(product);
+    }
+
+    [HttpPost]
+    [Route("update")]
+    public async Task<IActionResult> UpdateStatus(OrderUpdateform form)
+    {
+        var order = await this._dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == form.Id);
+
+        if (order == null)
+        {
+            return this.NotFound();
+        }
+
+        order.Status = form.Status;
+
+        this._dbContext.Set<Order>().Update(order);
+
+        return this.Ok();
+    }
 }

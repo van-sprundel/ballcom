@@ -114,7 +114,7 @@ public class OrderController : Controller
 
                     OrderProductViewModel orderProductView = new OrderProductViewModel()
                     {
-                        OrderProductId = orderProduct.OrderProductId,
+                        OrderProductId = orderProduct.ProductId,
                         OrderId = orderProduct.OrderId,
                         ProductId = orderProduct.ProductId
                     };
@@ -205,7 +205,7 @@ public class OrderController : Controller
                 
                 OrderProductViewModel orderProductView = new OrderProductViewModel()
                 {
-                    OrderProductId = orderProduct.OrderProductId,
+                    OrderProductId = orderProduct.ProductId,
                     OrderId = orderProduct.OrderId,
                     ProductId = orderProduct.ProductId
                 };
