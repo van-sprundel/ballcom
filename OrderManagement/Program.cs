@@ -29,7 +29,7 @@ builder.Services.AddSingleton(connection);
 // each exchange needs to know which queues it's going to send data to
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "order_exchange_order", new []{ "orderpicker_client", "transport_management","payment" } },
+    { "order_exchange_order", new []{ "orderpicker_client", "transport_management","payment","notifications" } },
     { "order_exchange_order_product", new []{ "orderpicker_client" } },
 };
 

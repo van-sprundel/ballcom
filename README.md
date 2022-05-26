@@ -94,7 +94,7 @@ Log in met user:pass `Rathalos`:`1234`
 Om bij phpMyAdmin te komen, ga naar http://localhost:8080/ \
 Log in met user:pass `root`:`secret`
 
-### Update databases
+## Update databases
 
 - Zorg ervoor dat de MariaDb draaiend is in de container.
 - Om te controleren of je entity framework heb, voer de volgende command uit in een powershell window.
@@ -127,7 +127,15 @@ dotnet ef database update
 
 Wil je alle databases tegelijkertijd updaten, run het script update-databases-all.ps1
 
-### Troubleshoot
+## Email
+De developer hoeft geen instellingen te veranderen om de email te laten werken. Dit is een test email server die binnen een knop gegenereerd wordt, het maakt me niet echt uit dat deze gegevens zichtbaar zijn.
+Verstuurde emails kunnen gecontrolleerd worden de volgende stappen uit te voeren:
+
+- Ga naar https://ethereal.email/messages
+- Log in met Email Adress: sonny.boehm17@ethereal.email en wachtwoord: tF7QwaRkauNkuDyJTq
+- Nu ben je in de mailbox waar je ontvangen en verstuurde emails kan zien.
+
+## Troubleshoot
 
 ```
 Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3306 -> 0.0.0.0:0: listen tcp 0.0.0.0:3306: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted 
