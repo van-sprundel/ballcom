@@ -25,6 +25,9 @@ public class InventoryMessageReceiver : MessageReceiver
                 case Product c:
                     {
                         Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+
+                        // Save product
+                        this._dbContext.Set<Product>().Add(c);
                         break;
                     }
             }

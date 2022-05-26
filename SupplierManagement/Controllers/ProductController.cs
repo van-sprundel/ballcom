@@ -2,6 +2,8 @@ using SupplierManagement.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SupplierManagement.Models;
+using BallCore.RabbitMq;
+using BallCore.Events;
 
 namespace ProductManagement.Controllers;
 
@@ -9,10 +11,12 @@ namespace ProductManagement.Controllers;
 public class ProductController : Controller
 {
     SupplierManagementDbContext _dbContext;
+    IMessageSender _messageSender;
 
-    public ProductController(SupplierManagementDbContext dbContext)
+    public ProductController(SupplierManagementDbContext dbContext, IMessageSender messageSender)
     {
         _dbContext = dbContext;
+        _messageSender = messageSender;
     }
 
     [HttpGet]
@@ -23,7 +27,7 @@ public class ProductController : Controller
 
     [HttpGet]
     [Route("{productId}", Name = "GetByProductId")]
-    public async Task<IActionResult> GetByProductId(int productId)
+    public async Task<IActionResult> Get(int productId)
     {
         var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.ProductId == productId);
         if (product != null)
@@ -37,7 +41,8 @@ public class ProductController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProductAsync([FromBody] CreateProductViewModel form)
+    [Route("create")]
+    public async Task<IActionResult> CreateAsync([FromBody] ProductCreateForm form)
     {
         try
         {
@@ -46,9 +51,17 @@ public class ProductController : Controller
                 var product = new Product
                 {
                     Name = form.Name,
+                    SupplierId = form.SupplierId
                 };
-                _dbContext.Products.Add(product);
+
+                // Add product
+                await _dbContext.Products.AddAsync(product);
+
+                // Save db
                 await _dbContext.SaveChangesAsync();
+
+                // Send event
+                this._messageSender.Send(new DomainEvent(product, EventType.Created, "inventory_management", false)); 
             }
 
             return BadRequest();
@@ -59,5 +72,30 @@ public class ProductController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError);
             throw;
         }
+    }
+
+    [HttpPost]
+    [Route("update")]
+    public async Task<IActionResult> UpdateAsync([FromBody] ProductUpdateForm form)
+    {
+        var product = await this._dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.Id);
+
+        if (product == null)
+        {
+            return this.NotFound();
+        }
+
+        product.Name = form.Name;
+
+        // Add product
+        _dbContext.Products.Update(product);
+
+        // Save db
+        await _dbContext.SaveChangesAsync();
+
+        // Send event
+        this._messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management", false));
+
+        return this.Ok();
     }
 }

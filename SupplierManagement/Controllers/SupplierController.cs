@@ -1,3 +1,4 @@
+using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,6 @@ public class SupplierController : Controller
     }
 
     [HttpGet]
-    [Route("test", Name = "Test")]
-    public async Task<IActionResult> Test()
-    {
-        return await Task.FromResult(Ok("test"));
-    }
-    [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
         var suppliers = await _dbContext.Set<Supplier>().Select(
@@ -38,12 +33,12 @@ public class SupplierController : Controller
 
 
     [HttpGet]
-    [Route("{supplierId}", Name = "GetBySupplierId")]
-    public async Task<IActionResult> GetAsync(int supplierId)
+    [Route("{id}", Name = "GetBySupplierId")]
+    public async Task<IActionResult> GetAsync(int id)
     {
         var supplier = await _dbContext
             .Set<Supplier>()
-            .FirstOrDefaultAsync(c => c.SupplierId == supplierId);
+            .FirstOrDefaultAsync(c => c.SupplierId == id);
 
         if (supplier == null)
         {
@@ -60,7 +55,7 @@ public class SupplierController : Controller
 
     [HttpPost]
     [Route("add")]
-    public async Task<IActionResult> AddSupplierAsync([FromBody] CreateSupplierViewModel form)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateSupplierViewModel form)
     {
         try
         {
@@ -72,8 +67,13 @@ public class SupplierController : Controller
                     Email = form.Email,
                     Products = new List<Product>()
                 };
-                _dbContext.Suppliers.Add(supplier);
+
+                await _dbContext
+                    .Set<Supplier>()
+                    .AddAsync(supplier);
+
                 await _dbContext.SaveChangesAsync();
+
                 return CreatedAtRoute("GetBySupplierId", new { supplierId = supplier.SupplierId }, supplier);
 
             }
