@@ -1,8 +1,9 @@
-﻿using BallCore.Enums;
+﻿using BallCore;
+using BallCore.Enums;
 
 namespace NotificationService.Models;
 
-public class Ticket
+public class Ticket : IDomainModel
 {
     public int TicketId { get; set; }
     public TicketStatus  Status { get; set; }
