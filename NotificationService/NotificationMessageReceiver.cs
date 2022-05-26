@@ -2,6 +2,7 @@
 using BallCore.Events;
 using BallCore.RabbitMq;
 using NotificationService.DataAccess;
+using NotificationService.Email;
 using NotificationService.Models;
 using RabbitMQ.Client;
 
@@ -10,11 +11,15 @@ namespace NotificationService;
 public class NotificationMessageReceiver : MessageReceiver
 {
     private readonly NotificationServiceDbContext _dbContext;
+    private readonly EmailWriter _emailWriter;
+    private readonly IEmailService _emailService;
 
-    public NotificationMessageReceiver(IConnection connection, NotificationServiceDbContext dbContext) :
+    public NotificationMessageReceiver(IConnection connection, NotificationServiceDbContext dbContext, IEmailService emailService) :
         base(connection, new[] { "notifications" })
     {
         _dbContext = dbContext;
+        _emailWriter = new EmailWriter();
+        _emailService = emailService;
     }
 
     protected override Task HandleMessage(IEvent e)
@@ -29,9 +34,7 @@ public class NotificationMessageReceiver : MessageReceiver
                     Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
                     if (de.Type == EventType.Created)
                     {
-                        Console.WriteLine("Sending email about order being submitted");
-                       //TODO:
-                        // Send email order submitted
+                        Console.WriteLine("Order Created");
                         break;
                     }
                     
@@ -39,29 +42,61 @@ public class NotificationMessageReceiver : MessageReceiver
                     if (de.Type == EventType.Updated)
                     {
                         Console.WriteLine("Sending Email about order updated");
-                        //TODO: Send Email statusProcess has changed.
-                        if (c.StatusProcess == StatusProcess.Arrived && c.IsPaid == false)
+                        Customer customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                        if (customer == null || customer.Email == null)
                         {
-                            // TODO: Send reminder to pay.
+                            Console.WriteLine("customer does not exist.");
+                            break;
                         }
-                        break;
+                        // Send email order submitted/
+                        if (c.StatusProcess == StatusProcess.Collecting)
+                        {
+                            _emailWriter.WriteOrderSubmitted(customer.Email, _emailService);
+                            break;
+                        }
+                        
+                        // Send email order underway.
+                        if (c.StatusProcess == StatusProcess.Underway)
+                        {
+                            _emailWriter.WriteOrderUnderway(customer.Email, _emailService);
+                            break;
+                        }
+
+
+                        // Send email order arrived
+                        if (c.StatusProcess == StatusProcess.Arrived)
+                        {
+                            if (c.IsPaid == true)
+                            {
+                                _emailWriter.WriteOrderArrived(customer.Email, _emailService);
+                            }
+                            else
+                            {
+                                _emailWriter.WriteOrderArrivedPaymentNeeded(customer.Email, _emailService);
+                            }
+                        }
                     }
                     break;
                 }
                 case Ticket c:
                 {
                     Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
+                    Customer customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                    if (customer == null || customer.Email == null)
+                    {
+                        Console.WriteLine("customer does not exist.");
+                        break;
+                    }
                     if (de.Type == EventType.Created)
                     {
                         Console.WriteLine("Sending Email about ticket created");
-                        //TODO: Send email
+                        _emailWriter.WriteTicketCreated(customer.Email, _emailService);
                         break;
                     }
                     if (de.Type == EventType.Updated)
                     {
                         Console.WriteLine("Sending Email about ticket created");
-                        //TODO: Send email
-                        break;
+                        _emailWriter.WriteTicketUpdated(customer.Email, _emailService);
                     }
                     break;
                 }
@@ -88,8 +123,6 @@ public class NotificationMessageReceiver : MessageReceiver
                         break;
                     }
                     break;
-                    
-                    
                 }
                     
             }

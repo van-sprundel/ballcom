@@ -2,9 +2,13 @@ using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using NotificationService;
 using NotificationService.DataAccess;
+using NotificationService.Email;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Email
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // add DBContext
 var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDbConnectionString");
