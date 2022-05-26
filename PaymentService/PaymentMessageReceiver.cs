@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using BallCore.Events;
+﻿using BallCore.Events;
 using BallCore.RabbitMq;
 using PaymentService.DataAccess;
 using PaymentService.Models;
@@ -9,15 +8,15 @@ namespace PaymentService;
 
 public class PaymentMessageReceiver : MessageReceiver
 {
-    private readonly IMessageSender _messageSender;
     private readonly PaymentServiceDbContext _paymentServiceDbContext;
+    private readonly IMessageSender _messageSender;
 
-    public PaymentMessageReceiver(IConnection connection, IMessageSender messageSender,
-        PaymentServiceDbContext paymentServiceDbContext) : base(connection,
+    public PaymentMessageReceiver(IConnection connection,
+        PaymentServiceDbContext paymentServiceDbContext, IMessageSender messageSender) : base(connection,
         new[] { "payment" })
     {
-        _messageSender = messageSender;
         _paymentServiceDbContext = paymentServiceDbContext;
+        _messageSender = messageSender;
     }
 
     // Example of how to handle message
@@ -26,15 +25,68 @@ public class PaymentMessageReceiver : MessageReceiver
         Console.WriteLine("Received message");
         switch (e)
         {
-            case DomainEvent { Payload: Customer customer } de:
+            case DomainEvent { Payload: Customer c } de:
             {
-                _paymentServiceDbContext.Add(customer);
+                if (de.Type == EventType.Created)
+                {
+                    var customer = new Customer()
+                    {
+                        Email = c.Email,
+                        CustomerId = c.CustomerId,
+                        FirstName = c.FirstName,
+                        LastName = c.LastName
+                    };
+                    _paymentServiceDbContext.Customers.Add(customer);
+                }
+                else if (de.Type == EventType.Updated)
+                {
+                    var customer =
+                        _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
+                    if (customer == null)
+                    {
+                        break;
+                    }
+
+                    _paymentServiceDbContext.Customers.Update(customer);
+                    _paymentServiceDbContext.SaveChanges();
+                }
+                else if (de.Type == EventType.Deleted)
+                {
+                    var customer = _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
+                    if (customer == null)
+                    {
+                        break;
+                    }
+
+                    _paymentServiceDbContext.Customers.Remove(customer);
+                    _paymentServiceDbContext.SaveChanges();
+                }
+
                 break;
             }
             case DomainEvent { Payload: Order order } de:
             {
                 Console.WriteLine($"Received {de.Type} message {de.Name} from {de.Destination} : {order.IsPaid}");
-                _paymentServiceDbContext.Orders.Add(order);
+                switch (de.Type)
+                {
+                    case EventType.Created:
+                    {
+                        _paymentServiceDbContext.Orders.Add(order);
+                        break;
+                    }
+                    case EventType.Updated:
+                    {
+                        _paymentServiceDbContext.Orders.Update(order);
+                        _paymentServiceDbContext.SaveChanges();
+                        break;
+                    }
+                    case EventType.Deleted:
+                    {
+                        _paymentServiceDbContext.Orders.Remove(order);
+                        _paymentServiceDbContext.SaveChanges();
+                        break;
+                    }
+                }
                 // if (de.Destination == "orderpicker_exchange" &&
                 //     de.Type == EventType.Created &&
                 //     !order.IsPaid)
@@ -48,17 +100,16 @@ public class PaymentMessageReceiver : MessageReceiver
                 //         "orderpicker"
                 //     ));
                 // }
-                //
-                // if (de.Destination == "transportmanagement_exchange" &&
-                //     de.Type == EventType.Updated &&
-                //     order.StatusProcess == StatusProcess.Arrived &&
-                //     !order.IsPaid)
-                // {
-                //     //send notification back with link to pay for order
-                //     //we can just make this /api/order/{id}/pay
-                //     // var notification = ;
-                //     // _messageSender.Send(new DomainEvent(notification, EventType.Updated, "notificationservice"));
-                // }
+
+                if (de.Destination == "transportmanagement_exchange" &&
+                    de.Type == EventType.Updated &&
+                    order.StatusProcess == StatusProcess.Arrived &&
+                    !order.IsPaid)
+                {
+                    //send notification to notificationservice so customer gets an email
+                    _messageSender.Send(new DomainEvent(order, EventType.Updated, "notificationservice"));
+                }
+
                 break;
             }
         }

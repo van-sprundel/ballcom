@@ -48,6 +48,10 @@ public class OrderController : Controller
         {
             if (ModelState.IsValid)
             {
+                if (!_dbContext.Customers.Any(c => c.CustomerId == form.CustomerId))
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "Customer does not exist");
+                }
                 Order order = new Order
                 {
                     CustomerId = form.CustomerId,
@@ -57,26 +61,12 @@ public class OrderController : Controller
                     StatusProcess = StatusProcess.Pending,
                     Price = 0,
                     IsPaid = false,
-                    OrderProducts = new List<OrderProduct>()
                 };
                 // insert order
                 _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
 
-                //PURE TESTING
-                // Order order2 = new Order
-                // {
-                //     CustomerId = form.CustomerId,
-                //     ArrivalCity = "TESTING",
-                //     ArrivalAdress = "TESTING",
-                //     OrderDate = DateTime.Now,
-                //     StatusProcess = StatusProcess.Pending,
-                //     Price = 900,
-                //     IsPaid = false,
-                //     OrderProducts = new List<OrderProduct>()
-                // };
-                //
-                // _rmq.Send(new DomainEvent(order2, EventType.Created, "order", false));
+                _rmq.Send(new DomainEvent(order, EventType.Created, "order_exchange_order", true));
 
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
@@ -101,7 +91,7 @@ public class OrderController : Controller
             {
                 var order =  await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
                 var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
-                if (product != null && order != null)
+                if (product != null && order != null )
                 {
                     if (order.StatusProcess != StatusProcess.Pending)
                     {
@@ -111,7 +101,7 @@ public class OrderController : Controller
                     {
                         return StatusCode(StatusCodes.Status410Gone, "Order is out of stock");
                     }
-                    OrderProduct orderProduct = new OrderProduct 
+                    var orderProduct = new OrderProduct 
                     { 
                         OrderId = orderNumber,
                         ProductId = productNumber
@@ -121,6 +111,15 @@ public class OrderController : Controller
                     _dbContext.OrderProduct.Add(orderProduct);
                     _dbContext.Orders.Update(order);
                     await _dbContext.SaveChangesAsync();
+
+                    OrderProductViewModel orderProductView = new OrderProductViewModel()
+                    {
+                        OrderProductId = orderProduct.ProductId,
+                        OrderId = orderProduct.OrderId,
+                        ProductId = orderProduct.ProductId
+                    };
+                    
+                    _rmq.Send(new DomainEvent(orderProductView, EventType.Created, "order_exchange_order_product", true));
 
                     // return result
                     return Ok();
@@ -160,8 +159,8 @@ public class OrderController : Controller
                 return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
             }
             
-            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
-            if (amountProducts < 1)
+            var orderProducts = _dbContext.OrderProduct.Where(op => op.OrderId == orderNumber);
+            if (!orderProducts.Any())
             {
                 return StatusCode(StatusCodes.Status403Forbidden, "Order needs at least one product");
             }
@@ -171,7 +170,7 @@ public class OrderController : Controller
             await _dbContext.SaveChangesAsync();
             
             // Send event
-            _rmq.Send(new DomainEvent(order, EventType.Created, "order", false));
+            _rmq.Send(new DomainEvent(order, EventType.Updated, "order_exchange_order", true));
 
             return StatusCode(StatusCodes.Status200OK, order);
         }
@@ -203,6 +202,15 @@ public class OrderController : Controller
                 _dbContext.OrderProduct.Remove(orderProduct);
                 _dbContext.Orders.Update(order);
                 await _dbContext.SaveChangesAsync();
+                
+                OrderProductViewModel orderProductView = new OrderProductViewModel()
+                {
+                    OrderProductId = orderProduct.ProductId,
+                    OrderId = orderProduct.OrderId,
+                    ProductId = orderProduct.ProductId
+                };
+                
+                _rmq.Send(new DomainEvent(orderProductView, EventType.Deleted, "order_exchange_order_product", true));
 
                 // return result
                 return StatusCode(StatusCodes.Status204NoContent);

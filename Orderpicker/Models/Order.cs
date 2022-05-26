@@ -1,9 +1,11 @@
-﻿namespace Orderpicker.Models;
+﻿using BallCore.Enums;
+
+namespace Orderpicker.Models;
 
 public class Order
 {
-    public int OrderId { get; set; }
-    public OrderStatus OrderStatus { get; set; }
-    
-    public List<Product> Products { get; set; }
+    public int Id { get; set; }
+    public StatusProcess Status { get; set; }
+    public bool IsDone { get; set; }
+    public ICollection<OrderProduct> Products { get; set; }
 }

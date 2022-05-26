@@ -1,5 +1,7 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
+using Microsoft.EntityFrameworkCore;
+using OrderManagement.Controllers;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
 using RabbitMQ.Client;
@@ -8,12 +10,14 @@ namespace OrderManagement;
 
 public class OrderMessageReceiver : MessageReceiver
 {
-    
     private readonly OrderManagementDbContext _dbContext;
-    
-    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext) : base(connection, new[] {"customer", "product", "order", "general"})
+    private readonly IMessageSender _rmq;
+
+    public OrderMessageReceiver(IConnection connection, OrderManagementDbContext dbContext, IMessageSender rmq) :
+        base(connection, new[] { "order_management" })
     {
         _dbContext = dbContext;
+        _rmq = rmq;
     }
 
     protected override Task HandleMessage(IEvent e)
@@ -25,23 +29,36 @@ public class OrderMessageReceiver : MessageReceiver
             {
                 case Order c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
                     if (de.Type == EventType.Updated)
                     {
                         // Update het order.
-                        _dbContext.Orders.Update(c);
+                        var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderId == c.OrderId);
+                        existingOrder.StatusProcess = c.StatusProcess ?? existingOrder.StatusProcess;
+
+                        _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();
-                        break;
+
+                        _rmq.Send(new DomainEvent(existingOrder, EventType.Updated, "order_exchange_order", true));
                     }
+
                     break;
                 }
-                
+
                 case Customer c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
                     if (de.Type == EventType.Created)
                     {
-                        _dbContext.Customers.Add(c);
+                        var customer = new Customer()
+                        {
+                            CustomerId = c.CustomerId,
+                            Email = c.Email,
+                            Orders = c.Orders,
+                        };
+                        _dbContext.Customers.Add(customer);
                         _dbContext.SaveChanges();
                         break;
                     }
@@ -59,12 +76,14 @@ public class OrderMessageReceiver : MessageReceiver
                         _dbContext.SaveChanges();
                         break;
                     }
+
                     break;
                 }
-                
+
                 case Product c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
                     if (de.Type == EventType.Created)
                     {
                         // Add het product toe.
@@ -88,11 +107,12 @@ public class OrderMessageReceiver : MessageReceiver
                         _dbContext.SaveChangesAsync();
                         break;
                     }
+
                     break;
                 }
             }
         }
-        
+
         return Task.CompletedTask;
     }
 }

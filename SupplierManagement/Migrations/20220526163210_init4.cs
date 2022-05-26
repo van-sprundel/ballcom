@@ -2,9 +2,9 @@
 
 #nullable disable
 
-namespace Orderpicker.Migrations
+namespace SupplierManagement.Migrations
 {
-    public partial class init2 : Migration
+    public partial class init4 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
