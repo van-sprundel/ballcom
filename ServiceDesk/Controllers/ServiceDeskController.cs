@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BallCore.Enums;
 using BallCore.Events;
 using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ public class ServiceDeskController : Controller
     {
         var tickets = await _dbContext.Set<Ticket>()
         .Include(c => c.Customer)
-        .Where(x => x.Status == Status.Open)
+        .Where(x => x.Status == TicketStatus.Open)
         .Select(
             x => new TicketViewModel
             {
@@ -65,7 +66,7 @@ public class ServiceDeskController : Controller
     {
         var tickets = await _dbContext.Set<Ticket>()
         .Include(c => c.Customer)
-        .Where(x => x.Status == Status.Closed)
+        .Where(x => x.Status == TicketStatus.Closed)
         .Select(
             x => new TicketViewModel
             {
@@ -85,7 +86,7 @@ public class ServiceDeskController : Controller
     {
         var tickets = await _dbContext.Set<Ticket>()
         .Include(c => c.Customer)
-        .Where(x => x.Status == Status.Solved)
+        .Where(x => x.Status == TicketStatus.Solved)
         .Select(
             x => new TicketViewModel
             {
@@ -105,7 +106,7 @@ public class ServiceDeskController : Controller
     {
         var tickets = await _dbContext.Set<Ticket>()
         .Include(c => c.Customer)
-        .Where(x => x.Status == Status.Pending)
+        .Where(x => x.Status == TicketStatus.Pending)
         .Select(
             x => new TicketViewModel
             {
@@ -221,7 +222,7 @@ public class ServiceDeskController : Controller
                 ticket.Status = form.Status;
 
                 // Check if ticket is solved
-                if(ticket.Status == Status.Solved) {
+                if(ticket.Status == TicketStatus.Solved) {
                     //Send message to customer
                 }
 
