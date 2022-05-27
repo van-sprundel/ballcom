@@ -104,7 +104,8 @@ public class OrderController : Controller
                     var orderProduct = new OrderProduct 
                     { 
                         OrderId = orderNumber,
-                        ProductId = productNumber
+                        ProductId = productNumber,
+                        IsPicked = false
                     };
                     order.Price += product.Price;
                     // Insert
@@ -116,7 +117,8 @@ public class OrderController : Controller
                     {
                         OrderProductId = orderProduct.ProductId,
                         OrderId = orderProduct.OrderId,
-                        ProductId = orderProduct.ProductId
+                        ProductId = orderProduct.ProductId,
+                        IsPicked = orderProduct.IsPicked
                     };
                     
                     _rmq.Send(new DomainEvent(orderProductView, EventType.Created, "order_exchange_order_product", true));
@@ -207,7 +209,8 @@ public class OrderController : Controller
                 {
                     OrderProductId = orderProduct.ProductId,
                     OrderId = orderProduct.OrderId,
-                    ProductId = orderProduct.ProductId
+                    ProductId = orderProduct.ProductId,
+                    IsPicked = orderProduct.IsPicked
                 };
                 
                 _rmq.Send(new DomainEvent(orderProductView, EventType.Deleted, "order_exchange_order_product", true));
