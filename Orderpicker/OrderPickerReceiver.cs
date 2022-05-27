@@ -42,6 +42,8 @@ public class OrderPickerReceiver : MessageReceiver
                 }
             }
 
+        _dbContext.SaveChanges();
+
         return Task.CompletedTask;
     }
 }

@@ -38,9 +38,9 @@ public class InventoryMessageReceiver : MessageReceiver
 
                             // Save product
                             _dbContext.Set<Product>().Update(c);
-                            _dbContext.SaveChanges();
                         }
-
+                        
+                        _dbContext.SaveChanges();
                         break;
                     }
             }
