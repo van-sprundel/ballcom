@@ -2,6 +2,7 @@ using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Orderpicker;
 using Orderpicker.DataAccess;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 

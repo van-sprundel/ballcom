@@ -4,6 +4,7 @@ using Orderpicker.DataAccess;
 using Orderpicker.Models;
 using BallCore.Enums;
 using BallCore.Events;
+using BallCore.RabbitMq;
 
 namespace Orderpicker.Controllers;
 
@@ -11,7 +12,7 @@ namespace Orderpicker.Controllers;
 public class OrderpickerController : Controller
 {
     private readonly OrderpickerDbContext _dbContext;
-    private readonly IMessageSender _messageSender);
+    private readonly IMessageSender _messageSender;
 
     public OrderpickerController(OrderpickerDbContext dbContext, IMessageSender messageSender)
     {
