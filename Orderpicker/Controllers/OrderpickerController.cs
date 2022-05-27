@@ -93,17 +93,22 @@ public class OrderpickerController : Controller
     [Route("update-product")]
     public async Task<IActionResult> UpdateOrderProductStatus(OrderUpdateform form)
     {
-        var orderProduct = await this._dbContext.Set<OrderProduct>().FirstOrDefaultAsync(x => x.OrderProductId == form.Id);
+        var orderProduct = await _dbContext.OrderProducts.Include(p => p.Order).FirstOrDefaultAsync(x => x.OrderProductId == form.Id);
 
         if (orderProduct == null)
         {
             return NotFound();
         }
-
         orderProduct.IsPicked = true;
+        orderProduct.Product.Quantity -= 1;
+        _dbContext.OrderProducts.Update(orderProduct);
+        _dbContext.Products.Update(orderProduct.Product);
 
-        _dbContext.Set<OrderProduct>().Update(orderProduct);
+        await _dbContext.SaveChangesAsync();
+
+        //TODO: Send event
 
         return Ok();
+        
     }
 }

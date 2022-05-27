@@ -52,18 +52,6 @@ public class InventoryController : Controller
         });
     }
 
-    [HttpDelete]
-    [Route("delete/{id}", Name = "Delete product")]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        var product = await _dbContext
-            .Set<Product>()
-            .FirstOrDefaultAsync(c => c.ProductId == id);
-
-        if (product == null) return NotFound("Couldn't find product");
-        return Ok(product);
-    }
-
     [AllowAnonymous]
     [HttpPost]
     [Route("update")]
@@ -79,9 +67,7 @@ public class InventoryController : Controller
         product.Name = form.Name;
 
         // insert product
-        _dbContext
-            .Set<Product>()
-            .Update(product);
+        _dbContext.Products.Update(product);
 
         await _dbContext.SaveChangesAsync();
 
