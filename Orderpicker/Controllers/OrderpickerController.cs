@@ -68,32 +68,32 @@ public class OrderpickerController : Controller
     [Route("update")]
     public async Task<IActionResult> UpdateStatus(OrderUpdateform form)
     {
-        var order = await this._dbContext
+        var order = await _dbContext
             .Set<Order>()
             .FirstOrDefaultAsync(x => x.Id == form.Id);
 
         if (order == null)
         {
-            return this.NotFound();
+            return NotFound();
         }
 
         order.Status = form.Status;
 
-        this._dbContext
+        _dbContext
             .Set<Order>()
             .Update(order);
 
         // Send update to order management
-        this._messageSender.Send(new DomainEvent(order, EventType.Updated, "order_management", false));
+        _messageSender.Send(new DomainEvent(order, EventType.Updated, "orderpicker_exchange", true));
 
-        return this.Ok();
+        return Ok();
     }
 
     [HttpPost]
     [Route("update-product")]
     public async Task<IActionResult> UpdateOrderProductStatus(OrderUpdateform form)
     {
-        var orderProduct = await this._dbContext.Set<OrderProduct>().FirstOrDefaultAsync(x => x.OrderProductId == form.Id);
+        var orderProduct = await _dbContext.Set<OrderProduct>().FirstOrDefaultAsync(x => x.OrderProductId == form.Id);
 
         if (orderProduct == null)
         {

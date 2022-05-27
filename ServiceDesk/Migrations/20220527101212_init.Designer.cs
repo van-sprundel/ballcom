@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PaymentService.DataAccess;
+using ServiceDesk.DataAccess;
 
 #nullable disable
 
-namespace PaymentService.Migrations
+namespace ServiceDesk.Migrations
 {
-    [DbContext(typeof(PaymentServiceDbContext))]
-    [Migration("20220527090658_init")]
+    [DbContext(typeof(ServiceDeskDbContext))]
+    [Migration("20220527101212_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,17 +20,13 @@ namespace PaymentService.Migrations
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("PaymentService.Models.Customer", b =>
+            modelBuilder.Entity("ServiceDesk.Models.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -43,64 +39,38 @@ namespace PaymentService.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("PaymentService.Models.Invoice", b =>
+            modelBuilder.Entity("ServiceDesk.Models.Ticket", b =>
                 {
-                    b.Property<int>("InvoiceId")
+                    b.Property<int>("TicketId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("InvoiceNumber")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("Orderid")
-                        .HasColumnType("int");
+                    b.Property<string>("TicketText")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
-                    b.HasKey("InvoiceId");
+                    b.HasKey("TicketId");
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("Orderid");
-
-                    b.ToTable("Invoices");
+                    b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("PaymentService.Models.Order", b =>
+            modelBuilder.Entity("ServiceDesk.Models.Ticket", b =>
                 {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("StatusProcess")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("PaymentService.Models.Invoice", b =>
-                {
-                    b.HasOne("PaymentService.Models.Customer", "Customer")
+                    b.HasOne("ServiceDesk.Models.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PaymentService.Models.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("Orderid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Order");
                 });
 #pragma warning restore 612, 618
         }

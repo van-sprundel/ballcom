@@ -69,7 +69,8 @@ public class SupplierController : Controller
 
                 await _dbContext.SaveChangesAsync();
 
-                return CreatedAtRoute("GetBySupplierId", new { supplierId = supplier.SupplierId }, supplier);
+                // return CreatedAtRoute("GetBySupplierId", new { id = supplier.SupplierId }, supplier);
+                return StatusCode(201,supplier);
             }
 
             return BadRequest();

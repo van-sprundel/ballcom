@@ -29,8 +29,7 @@ public class InventoryMessageReceiver : MessageReceiver
                         if(de.Type == EventType.Created)
                         {
                             // Save product
-                            this._dbContext.Set<Product>().Add(c);
-                            break;
+                            _dbContext.Set<Product>().Add(c);
                         }
                         if (de.Type == EventType.Updated)
                         {
@@ -38,8 +37,8 @@ public class InventoryMessageReceiver : MessageReceiver
                             c.Quantity -= 1;
 
                             // Save product
-                            this._dbContext.Set<Product>().Update(c);
-                            break;
+                            _dbContext.Set<Product>().Update(c);
+                            _dbContext.SaveChanges();
                         }
 
                         break;

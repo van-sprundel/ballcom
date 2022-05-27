@@ -9,5 +9,5 @@ public class Supplier
     public string Name { get; set; }
     public string Email { get; set; }
 
-    public List<Product> Products { get; set; }
+    public virtual List<Product> Products { get; set; }
 }
