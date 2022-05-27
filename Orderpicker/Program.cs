@@ -1,5 +1,6 @@
 using BallCore.RabbitMq;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Orderpicker;
 using Orderpicker.DataAccess;
 using RabbitMQ.Client;
@@ -44,15 +45,12 @@ builder.Services
 
 // Setup MVC
 builder.Services.AddControllers()
-    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();

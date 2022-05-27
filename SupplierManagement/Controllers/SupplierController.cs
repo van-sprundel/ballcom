@@ -1,5 +1,3 @@
-using BallCore.RabbitMq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SupplierManagement.DataAccess;
@@ -10,7 +8,7 @@ namespace SupplierManagement.Controllers;
 [Route("/api/[controller]")]
 public class SupplierController : Controller
 {
-    SupplierManagementDbContext _dbContext;
+    private readonly SupplierManagementDbContext _dbContext;
 
     public SupplierController(SupplierManagementDbContext dbContext)
     {
@@ -40,12 +38,9 @@ public class SupplierController : Controller
             .Set<Supplier>()
             .FirstOrDefaultAsync(c => c.SupplierId == id);
 
-        if (supplier == null)
-        {
-            return NotFound("Can't find supplier");
-        }
+        if (supplier == null) return NotFound("Can't find supplier");
 
-        return this.Ok(new SupplierViewModel
+        return Ok(new SupplierViewModel
         {
             Name = supplier.Name,
             Email = supplier.Email,
@@ -75,12 +70,9 @@ public class SupplierController : Controller
                 await _dbContext.SaveChangesAsync();
 
                 return CreatedAtRoute("GetBySupplierId", new { supplierId = supplier.SupplierId }, supplier);
+            }
 
-            }
-            else
-            {
-                return BadRequest();
-            }
+            return BadRequest();
         }
         catch (DbUpdateException)
         {

@@ -1,4 +1,3 @@
-using System;
 namespace SupplierManagement.Models;
 
 public class ProductCreateForm

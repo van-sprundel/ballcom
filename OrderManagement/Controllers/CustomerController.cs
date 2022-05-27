@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.DataAccess;
-using OrderManagement.Models;
 
 namespace OrderManagement.Controllers;
 
@@ -21,10 +19,7 @@ public class CustomerController : Controller
     public async Task<IActionResult> GetByCustomerId(int customerId)
     {
         var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.CustomerId == customerId);
-        if (customer == null)
-        {
-            return StatusCode(StatusCodes.Status404NotFound, "Customer could not be found");
-        }
+        if (customer == null) return StatusCode(StatusCodes.Status404NotFound, "Customer could not be found");
         customer.Orders = _dbContext.Orders.Where(o => o.CustomerId == customerId).ToList();
         return Ok(customer);
     }

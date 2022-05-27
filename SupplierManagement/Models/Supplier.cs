@@ -1,10 +1,11 @@
-﻿namespace SupplierManagement.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SupplierManagement.Models;
 
 public class Supplier
 {
-    [Key]
-    public int SupplierId { get; set; }
+    [Key] public int SupplierId { get; set; }
+
     public string Name { get; set; }
     public string Email { get; set; }
 

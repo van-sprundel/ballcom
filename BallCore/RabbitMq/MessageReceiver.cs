@@ -8,18 +8,18 @@ using RabbitMQ.Client.Events;
 namespace BallCore.RabbitMq;
 
 /// <summary>
-/// MessageReceiver
-/// Inherit from this class and implement the HandleMessage method
+///     MessageReceiver
+///     Inherit from this class and implement the HandleMessage method
 /// </summary>
 public abstract class MessageReceiver : IHostedService
 {
     private readonly IConnection _connection;
+    private readonly string[] _queues;
     private IModel? _channel;
     private AsyncEventingBasicConsumer? _consumer;
-    private readonly string[] _queues;
 
     /// <summary>
-    /// Specify which queues you want to subscribe to
+    ///     Specify which queues you want to subscribe to
     /// </summary>
     /// <param name="connection">The RabbitMQ connection</param>
     /// <param name="queues">The queues to listen to</param>
@@ -30,20 +30,20 @@ public abstract class MessageReceiver : IHostedService
     }
 
     /// <summary>
-    /// Start the receiver (automatically done by ASP when injected with AddHostedService)
+    ///     Start the receiver (automatically done by ASP when injected with AddHostedService)
     /// </summary>
     public Task StartAsync(CancellationToken cancellationToken)
     {
         return Task.Run(() =>
         {
             Console.WriteLine("Creating and starting RabbitMq receiver service");
-            
+
             //Create channel within connection. Note: a connection can contain multiple channels, but we use a connection per message receiver instance
             _channel = _connection.CreateModel();
-            
+
             //Declare queues
             foreach (var q in _queues)
-                _channel.QueueDeclare(queue: q, durable: true, exclusive: false, autoDelete: false, arguments: null);
+                _channel.QueueDeclare(q, true, false, false, null);
 
             _consumer = new AsyncEventingBasicConsumer(_channel);
             _consumer.Received += Consumer_Received;
@@ -55,6 +55,17 @@ public abstract class MessageReceiver : IHostedService
                 Console.WriteLine($"Consumer #{consumerTag} for {queue}");
             }
         }, cancellationToken);
+    }
+
+    /// <summary>
+    ///     Stop the service and disconnect
+    /// </summary>
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("Stopping RabbitMq receiver service");
+        _channel?.Dispose();
+        _consumer = null;
+        return Task.CompletedTask;
     }
 
     private async Task Consumer_Received(object sender, BasicDeliverEventArgs ea)
@@ -83,7 +94,7 @@ public abstract class MessageReceiver : IHostedService
                 var obj = (IDomainModel)JsonSerializer.Deserialize(ea.Body.ToArray(), type)!;
 
                 var isExchange = !string.IsNullOrEmpty(ea.Exchange);
-                
+
                 //2. Create Event object and call handler
                 await HandleMessage(new DomainEvent(obj, eventType, isExchange ? ea.Exchange : ea.RoutingKey,
                     isExchange));
@@ -98,27 +109,17 @@ public abstract class MessageReceiver : IHostedService
         {
             //Not a domain event
             var isExchange = !string.IsNullOrEmpty(ea.Exchange);
-            await HandleMessage(new RawEvent(ea.Body.Span, ea.BasicProperties.Type, isExchange ? ea.Exchange : ea.RoutingKey, isExchange));
+            await HandleMessage(new RawEvent(ea.Body.Span, ea.BasicProperties.Type,
+                isExchange ? ea.Exchange : ea.RoutingKey, isExchange));
         }
 
         await Task.Yield();
     }
 
     /// <summary>
-    /// Handle receive message
+    ///     Handle receive message
     /// </summary>
     /// <param name="e">The event that is received</param>
     /// <returns>True if ACK must be sent</returns>
     protected abstract Task HandleMessage(IEvent e);
-
-    /// <summary>
-    /// Stop the service and disconnect
-    /// </summary>
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        Console.WriteLine("Stopping RabbitMq receiver service");
-        _channel?.Dispose();
-        _consumer = null;
-        return Task.CompletedTask;
-    }
 }

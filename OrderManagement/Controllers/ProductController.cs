@@ -19,5 +19,4 @@ public class ProductController : Controller
     {
         return Ok(await _dbContext.Products.ToListAsync());
     }
-
 }

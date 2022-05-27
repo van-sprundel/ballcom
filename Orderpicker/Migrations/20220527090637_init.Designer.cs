@@ -10,8 +10,8 @@ using Orderpicker.DataAccess;
 namespace Orderpicker.Migrations
 {
     [DbContext(typeof(OrderpickerDbContext))]
-    [Migration("20220526163226_init4")]
-    partial class init4
+    [Migration("20220527090637_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

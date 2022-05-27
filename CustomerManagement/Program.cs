@@ -1,9 +1,6 @@
-using System.Text.Json;
-using BallCore.Events;
 using BallCore.RabbitMq;
 using CustomerManagement;
 using CustomerManagement.DataAccess;
-using CustomerManagement.Models;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 
@@ -54,10 +51,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();
@@ -72,10 +66,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<CustomerManagementDbContext>();
-    if (context.Database.GetPendingMigrations().Any())
-    {
-        context.Database.Migrate();
-    }
+    if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
 }
 
 Console.WriteLine("Starting application");

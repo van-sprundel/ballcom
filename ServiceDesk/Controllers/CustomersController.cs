@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BallCore.RabbitMq;
-using BallCore.Events;
 using ServiceDesk.DataAccess;
 using ServiceDesk.Models;
 
@@ -11,7 +8,7 @@ namespace ServiceDesk.Controllers;
 [Route("/api/[controller]")]
 public class CustomersController : Controller
 {
-    ServiceDeskDbContext _dbContext;
+    private readonly ServiceDeskDbContext _dbContext;
 
     public CustomersController(ServiceDeskDbContext dbContext)
     {
@@ -26,10 +23,7 @@ public class CustomersController : Controller
             .Set<Customer>()
             .FindAsync(customerId);
 
-        if (customer == null)
-        {
-            return NotFound("Couldn't find customer");
-        }
+        if (customer == null) return NotFound("Couldn't find customer");
 
         return Ok(new CustomerViewModel
         {

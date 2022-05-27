@@ -1,17 +1,17 @@
-using SupplierManagement.DataAccess;
+using BallCore.Events;
+using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SupplierManagement.DataAccess;
 using SupplierManagement.Models;
-using BallCore.RabbitMq;
-using BallCore.Events;
 
-namespace ProductManagement.Controllers;
+namespace SupplierManagement.Controllers;
 
 [Route("/api/[controller]")]
 public class ProductController : Controller
 {
-    SupplierManagementDbContext _dbContext;
-    IMessageSender _messageSender;
+    private readonly SupplierManagementDbContext _dbContext;
+    private readonly IMessageSender _messageSender;
 
     public ProductController(SupplierManagementDbContext dbContext, IMessageSender messageSender)
     {
@@ -31,13 +31,8 @@ public class ProductController : Controller
     {
         var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.ProductId == productId);
         if (product != null)
-        {
             return Ok(product);
-        }
-        else
-        {
-            return NotFound("Product not found");
-        }
+        return NotFound("Product not found");
     }
 
     [HttpPost]
@@ -61,7 +56,7 @@ public class ProductController : Controller
                 await _dbContext.SaveChangesAsync();
 
                 // Send event
-                this._messageSender.Send(new DomainEvent(product, EventType.Created, "inventory_management", false)); 
+                _messageSender.Send(new DomainEvent(product, EventType.Created, "inventory_management"));
             }
 
             return BadRequest();
@@ -78,12 +73,9 @@ public class ProductController : Controller
     [Route("update")]
     public async Task<IActionResult> UpdateAsync([FromBody] ProductUpdateForm form)
     {
-        var product = await this._dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.Id);
+        var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.Id);
 
-        if (product == null)
-        {
-            return this.NotFound();
-        }
+        if (product == null) return NotFound();
 
         product.Name = form.Name;
 
@@ -94,8 +86,8 @@ public class ProductController : Controller
         await _dbContext.SaveChangesAsync();
 
         // Send event
-        this._messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management", false));
+        _messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management"));
 
-        return this.Ok();
+        return Ok();
     }
 }

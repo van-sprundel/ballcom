@@ -17,7 +17,7 @@ if (!isDevelopment)
 {
     var connection = new ConnectionFactory
     {
-        HostName = isDevelopment ? "localhost" : "rabbitmq",
+        HostName = "rabbitmq",
         Port = 5672,
         UserName = "Rathalos",
         Password = "1234",
@@ -29,7 +29,7 @@ if (!isDevelopment)
 //Inject ExchangeDeclarator
     var exchanges = new Dictionary<string, IEnumerable<string>>
     {
-        { "supplier_exchange", new [] { "inventory_management", "general" } }
+        { "supplier_exchange", new[] { "inventory_management", "general" } }
     };
 
     builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -47,10 +47,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();
@@ -65,10 +62,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<SupplierManagementDbContext>();
-    if (context.Database.GetPendingMigrations().Any())
-    {
-        context.Database.Migrate();
-    }
+    if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
 }
 
 Console.WriteLine("Starting application");

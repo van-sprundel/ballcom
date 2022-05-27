@@ -11,10 +11,11 @@ namespace NotificationService;
 public class NotificationMessageReceiver : MessageReceiver
 {
     private readonly NotificationServiceDbContext _dbContext;
-    private readonly EmailWriter _emailWriter;
     private readonly IEmailService _emailService;
+    private readonly EmailWriter _emailWriter;
 
-    public NotificationMessageReceiver(IConnection connection, NotificationServiceDbContext dbContext, IEmailService emailService) :
+    public NotificationMessageReceiver(IConnection connection, NotificationServiceDbContext dbContext,
+        IEmailService emailService) :
         base(connection, new[] { "notifications" })
     {
         _dbContext = dbContext;
@@ -26,35 +27,36 @@ public class NotificationMessageReceiver : MessageReceiver
     {
         Console.WriteLine("Received message");
         if (e is DomainEvent de)
-        {
             switch (de.Payload)
             {
                 case Order c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
                     if (de.Type == EventType.Created)
                     {
                         Console.WriteLine("Order Created");
                         break;
                     }
-                    
-                    
+
+
                     if (de.Type == EventType.Updated)
                     {
                         Console.WriteLine("Sending Email about order updated");
-                        Customer customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                        var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                         if (customer == null || customer.Email == null)
                         {
                             Console.WriteLine("customer does not exist.");
                             break;
                         }
+
                         // Send email order submitted/
                         if (c.StatusProcess == StatusProcess.Collecting)
                         {
                             _emailWriter.WriteOrderSubmitted(customer.Email, _emailService);
                             break;
                         }
-                        
+
                         // Send email order underway.
                         if (c.StatusProcess == StatusProcess.Underway)
                         {
@@ -67,42 +69,44 @@ public class NotificationMessageReceiver : MessageReceiver
                         if (c.StatusProcess == StatusProcess.Arrived)
                         {
                             if (c.IsPaid == true)
-                            {
                                 _emailWriter.WriteOrderArrived(customer.Email, _emailService);
-                            }
                             else
-                            {
                                 _emailWriter.WriteOrderArrivedPaymentNeeded(customer.Email, _emailService);
-                            }
                         }
                     }
+
                     break;
                 }
                 case Ticket c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
-                    Customer customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
+                    var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                     if (customer == null || customer.Email == null)
                     {
                         Console.WriteLine("customer does not exist.");
                         break;
                     }
+
                     if (de.Type == EventType.Created)
                     {
                         Console.WriteLine("Sending Email about ticket created");
                         _emailWriter.WriteTicketCreated(customer.Email, _emailService);
                         break;
                     }
+
                     if (de.Type == EventType.Updated)
                     {
                         Console.WriteLine("Sending Email about ticket created");
                         _emailWriter.WriteTicketUpdated(customer.Email, _emailService);
                     }
+
                     break;
                 }
                 case Customer c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.CustomerId}");
                     if (de.Type == EventType.Created)
                     {
                         _dbContext.Customers.Add(c);
@@ -116,18 +120,17 @@ public class NotificationMessageReceiver : MessageReceiver
                         _dbContext.SaveChangesAsync();
                         break;
                     }
+
                     if (de.Type == EventType.Deleted)
                     {
                         _dbContext.Customers.Remove(c);
                         _dbContext.SaveChanges();
-                        break;
                     }
+
                     break;
                 }
-                    
             }
-        }
-        
+
         return Task.CompletedTask;
     }
 }

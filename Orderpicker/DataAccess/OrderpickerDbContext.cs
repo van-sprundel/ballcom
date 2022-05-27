@@ -7,7 +7,6 @@ public class OrderpickerDbContext : DbContext
 {
     public OrderpickerDbContext(DbContextOptions<OrderpickerDbContext> options) : base(options)
     {
-
     }
 
     public DbSet<Order> Orders { get; set; }

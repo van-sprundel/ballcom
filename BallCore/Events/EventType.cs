@@ -1,7 +1,7 @@
 namespace BallCore.Events;
 
 /// <summary>
-/// Domain event type
+///     Domain event type
 /// </summary>
 public enum EventType
 {

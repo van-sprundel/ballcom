@@ -14,7 +14,7 @@ public class Order : IDomainModel
     public bool? IsPaid { get; set; }
 
     public ICollection<OrderProduct> OrderProducts { get; set; }
-    
+
     public int CustomerId { get; set; }
     public Customer Customer { get; set; }
 }

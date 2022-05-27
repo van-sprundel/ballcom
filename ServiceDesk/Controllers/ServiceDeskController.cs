@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using BallCore.Enums;
+﻿using BallCore.Enums;
 using BallCore.Events;
 using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +7,12 @@ using ServiceDesk.DataAccess;
 using ServiceDesk.Models;
 
 namespace ServiceDesk.Controllers;
+
 [Route("/api/[controller]")]
 public class ServiceDeskController : Controller
 {
-    ServiceDeskDbContext _dbContext;
-    IMessageSender _messageSender;
+    private readonly ServiceDeskDbContext _dbContext;
+    private readonly IMessageSender _messageSender;
 
     public ServiceDeskController(ServiceDeskDbContext dbContext, IMessageSender messageSender)
     {
@@ -26,16 +24,16 @@ public class ServiceDeskController : Controller
     public async Task<IActionResult> GetAllAsync()
     {
         var tickets = await _dbContext.Set<Ticket>()
-        .Include(c => c.Customer)
-        .Select(
-            x => new TicketViewModel
-            {
-                TicketId = x.TicketId,
-                TicketText = x.TicketText,
-                Status = x.Status,
-                CustomerId = x.CustomerId,
-                Customer = x.Customer
-            }).ToListAsync();
+            .Include(c => c.Customer)
+            .Select(
+                x => new TicketViewModel
+                {
+                    TicketId = x.TicketId,
+                    TicketText = x.TicketText,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Customer = x.Customer
+                }).ToListAsync();
 
         return Ok(tickets);
     }
@@ -45,17 +43,17 @@ public class ServiceDeskController : Controller
     public async Task<IActionResult> GetAllOpenAsync()
     {
         var tickets = await _dbContext.Set<Ticket>()
-        .Include(c => c.Customer)
-        .Where(x => x.Status == TicketStatus.Open)
-        .Select(
-            x => new TicketViewModel
-            {
-                TicketId = x.TicketId,
-                TicketText = x.TicketText,
-                Status = x.Status,
-                CustomerId = x.CustomerId,
-                Customer = x.Customer
-            }).ToListAsync();
+            .Include(c => c.Customer)
+            .Where(x => x.Status == TicketStatus.Open)
+            .Select(
+                x => new TicketViewModel
+                {
+                    TicketId = x.TicketId,
+                    TicketText = x.TicketText,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Customer = x.Customer
+                }).ToListAsync();
 
         return Ok(tickets);
     }
@@ -65,17 +63,17 @@ public class ServiceDeskController : Controller
     public async Task<IActionResult> GetAllClosedAsync()
     {
         var tickets = await _dbContext.Set<Ticket>()
-        .Include(c => c.Customer)
-        .Where(x => x.Status == TicketStatus.Closed)
-        .Select(
-            x => new TicketViewModel
-            {
-                TicketId = x.TicketId,
-                TicketText = x.TicketText,
-                Status = x.Status,
-                CustomerId = x.CustomerId,
-                Customer = x.Customer
-            }).ToListAsync();
+            .Include(c => c.Customer)
+            .Where(x => x.Status == TicketStatus.Closed)
+            .Select(
+                x => new TicketViewModel
+                {
+                    TicketId = x.TicketId,
+                    TicketText = x.TicketText,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Customer = x.Customer
+                }).ToListAsync();
 
         return Ok(tickets);
     }
@@ -85,17 +83,17 @@ public class ServiceDeskController : Controller
     public async Task<IActionResult> GetAllSolvedAsync()
     {
         var tickets = await _dbContext.Set<Ticket>()
-        .Include(c => c.Customer)
-        .Where(x => x.Status == TicketStatus.Solved)
-        .Select(
-            x => new TicketViewModel
-            {
-                TicketId = x.TicketId,
-                TicketText = x.TicketText,
-                Status = x.Status,
-                CustomerId = x.CustomerId,
-                Customer = x.Customer
-            }).ToListAsync();
+            .Include(c => c.Customer)
+            .Where(x => x.Status == TicketStatus.Solved)
+            .Select(
+                x => new TicketViewModel
+                {
+                    TicketId = x.TicketId,
+                    TicketText = x.TicketText,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Customer = x.Customer
+                }).ToListAsync();
 
         return Ok(tickets);
     }
@@ -105,17 +103,17 @@ public class ServiceDeskController : Controller
     public async Task<IActionResult> GetAllPendingAsync()
     {
         var tickets = await _dbContext.Set<Ticket>()
-        .Include(c => c.Customer)
-        .Where(x => x.Status == TicketStatus.Pending)
-        .Select(
-            x => new TicketViewModel
-            {
-                TicketId = x.TicketId,
-                TicketText = x.TicketText,
-                Status = x.Status,
-                CustomerId = x.CustomerId,
-                Customer = x.Customer
-            }).ToListAsync();
+            .Include(c => c.Customer)
+            .Where(x => x.Status == TicketStatus.Pending)
+            .Select(
+                x => new TicketViewModel
+                {
+                    TicketId = x.TicketId,
+                    TicketText = x.TicketText,
+                    Status = x.Status,
+                    CustomerId = x.CustomerId,
+                    Customer = x.Customer
+                }).ToListAsync();
 
         return Ok(tickets);
     }
@@ -127,11 +125,8 @@ public class ServiceDeskController : Controller
         var ticket = await _dbContext
             .Set<Ticket>()
             .FirstOrDefaultAsync(c => c.TicketId == id);
-            
-        if (ticket == null)
-        {
-            return NotFound("Couldn't find ticket");
-        }
+
+        if (ticket == null) return NotFound("Couldn't find ticket");
 
         return Ok(new TicketViewModel
         {
@@ -150,11 +145,8 @@ public class ServiceDeskController : Controller
         var ticket = await _dbContext
             .Set<Ticket>()
             .FirstOrDefaultAsync(c => c.TicketId == id);
-            
-        if (ticket == null)
-        {
-            return NotFound("Couldn't find ticket");
-        }
+
+        if (ticket == null) return NotFound("Couldn't find ticket");
 
         _dbContext.Set<Ticket>().Remove(ticket);
         await _dbContext.SaveChangesAsync();
@@ -174,14 +166,14 @@ public class ServiceDeskController : Controller
                 {
                     TicketText = form.TicketText,
                     CustomerId = form.CustomerId,
-                    Status = form.Status,
+                    Status = form.Status
                 };
 
                 // insert customer
                 await _dbContext
                     .Set<Ticket>()
                     .AddAsync(ticket);
-                
+
                 await _dbContext.SaveChangesAsync();
 
                 return Ok(new TicketViewModel
@@ -212,28 +204,27 @@ public class ServiceDeskController : Controller
             if (ModelState.IsValid)
             {
                 var ticket = await _dbContext
-                .Set<Ticket>()
-                .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
+                    .Set<Ticket>()
+                    .FirstOrDefaultAsync(x => x.TicketId == form.TicketId);
 
-                if (ticket == null) {
-                    return NotFound("Couldn't find ticket");
-                }
-                
+                if (ticket == null) return NotFound("Couldn't find ticket");
+
                 ticket.Status = form.Status;
 
                 // Check if ticket is solved
-                if(ticket.Status == TicketStatus.Solved) {
+                if (ticket.Status == TicketStatus.Solved)
+                {
                     //Send message to customer
                 }
 
                 _dbContext
-                .Set<Ticket>()
-                .Update(ticket);
-                
+                    .Set<Ticket>()
+                    .Update(ticket);
+
                 await _dbContext.SaveChangesAsync();
 
                 //TODO: send event
-                this._messageSender.Send(new DomainEvent(ticket, EventType.Updated, "notifications", false));
+                _messageSender.Send(new DomainEvent(ticket, EventType.Updated, "notifications"));
 
                 // return result
                 return CreatedAtRoute("UpdateTicket", new { ticketId = ticket.TicketId }, ticket);
