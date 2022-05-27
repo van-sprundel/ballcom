@@ -162,11 +162,14 @@ public class ServiceDeskController : Controller
         {
             if (ModelState.IsValid)
             {
+                var contains = _dbContext.Customers.Any(c => c.CustomerId == form.CustomerId);
+                if (!contains) return BadRequest();
+                
                 var ticket = new Ticket
-                {   
+                {
                     TicketText = form.TicketText,
                     CustomerId = form.CustomerId,
-                    Status = form.Status
+                    Status = TicketStatus.Open
                 };
 
                 // insert customer
@@ -185,7 +188,7 @@ public class ServiceDeskController : Controller
                 });
             }
 
-            return BadRequest();
+            return BadRequest("Modelstate is invalid");
         }
         catch (DbUpdateException)
         {

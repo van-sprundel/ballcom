@@ -85,7 +85,7 @@ public class ProductController : Controller
                 // Save db
                 await _dbContext.SaveChangesAsync();
 
-                // Send event
+                // Send event       
                 _messageSender.Send(new DomainEvent(product, EventType.Created, "supplier_exchange",true));
 
                 return StatusCode(201, product);

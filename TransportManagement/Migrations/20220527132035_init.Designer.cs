@@ -11,7 +11,7 @@ using TransportManagement.DataAccess;
 namespace TransportManagement.Migrations
 {
     [DbContext(typeof(TransportManagementDbContext))]
-    [Migration("20220527101335_init")]
+    [Migration("20220527132035_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

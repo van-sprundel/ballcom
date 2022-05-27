@@ -1,7 +1,6 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
-using Microsoft.EntityFrameworkCore;
-using OrderManagement.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
 using OrderManagement.ViewModels;
@@ -28,15 +27,39 @@ public class OrderMessageReceiver : MessageReceiver
         {
             switch (de.Payload)
             {
-                case Order c:
+                case Order o:
                 {
                     Console.WriteLine(
-                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {o.ArrivalAdress}");
+                    if (de.Type == EventType.Created)
+                    {
+                        var order = new Order()
+                        {
+                            Price = o.Price,
+                            ArrivalAdress = o.ArrivalAdress,
+                            ArrivalCity = o.ArrivalCity,
+                            CustomerId = o.CustomerId,
+                            IsPaid = o.IsPaid,
+                            OrderId = o.OrderId,
+                            OrderDate = o.OrderDate,
+                            OrderProducts = o.OrderProducts,
+                            StatusProcess = o.StatusProcess
+                        };
+
+                        _dbContext.Orders.Add(order);
+                        _dbContext.SaveChanges();
+                    }
+
                     if (de.Type == EventType.Updated)
                     {
                         // Update het order.
-                        var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderId == c.OrderId);
-                        existingOrder.StatusProcess = c.StatusProcess ?? existingOrder.StatusProcess;
+                        var existingOrder = _dbContext.Orders.FirstOrDefault(order => order.OrderId == o.OrderId);
+
+                        if (existingOrder == null)
+                            return Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
+
+                        existingOrder.StatusProcess = o.StatusProcess ?? existingOrder.StatusProcess;
+                        existingOrder.IsPaid = o.IsPaid;
 
                         _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();
@@ -67,7 +90,7 @@ public class OrderMessageReceiver : MessageReceiver
                     {
                         var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                         if (customer == null) break;
-                        
+
                         _dbContext.Customers.Remove(customer);
                         _dbContext.SaveChanges();
                         break;
@@ -77,7 +100,7 @@ public class OrderMessageReceiver : MessageReceiver
                     {
                         var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                         if (customer == null) break;
-                        
+
                         customer.Email = c.Email;
                         _dbContext.Customers.Update(customer);
                         _dbContext.SaveChanges();
@@ -89,7 +112,8 @@ public class OrderMessageReceiver : MessageReceiver
 
                 case Product c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
                     if (de.Type == EventType.Created)
                     {
                         // Add het product toe.
@@ -114,6 +138,7 @@ public class OrderMessageReceiver : MessageReceiver
                             _dbContext.Products.Remove(product);
                             _dbContext.SaveChanges();
                         }
+
                         break;
                     }
 
@@ -129,6 +154,7 @@ public class OrderMessageReceiver : MessageReceiver
                             _dbContext.Products.Update(product);
                             _dbContext.SaveChangesAsync();
                         }
+
                         break;
                     }
 
@@ -137,19 +163,23 @@ public class OrderMessageReceiver : MessageReceiver
 
                 case OrderProductViewModel c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.OrderProductId}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.OrderProductId}");
                     if (de.Type == EventType.Updated)
                     {
                         // Verander orderstatus.
-                        var orderProduct = _dbContext.OrderProduct.FirstOrDefault(op => op.OrderProductId == c.OrderProductId);
+                        var orderProduct =
+                            _dbContext.OrderProduct.FirstOrDefault(op => op.OrderProductId == c.OrderProductId);
                         if (orderProduct != null)
                         {
                             orderProduct.IsPicked = c.IsPicked;
                             _dbContext.OrderProduct.Update(orderProduct);
                             _dbContext.SaveChanges();
                         }
+
                         break;
                     }
+
                     break;
                 }
             }
