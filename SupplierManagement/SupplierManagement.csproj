@@ -2,33 +2,40 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <RuntimeIdentifiers>win10-x64;osx.10.11-x64;ubuntu.16.04-x64</RuntimeIdentifiers>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
-
-
+    
     <ItemGroup>
-        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.9.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.5"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.5"/>
+        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="12.9.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1"/>
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <Folder Include="Migrations"/>
+        <Folder Include="Migrations" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\BallCore\BallCore.csproj"/>
+        <ProjectReference Include="..\BallCore\BallCore.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="out\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="out\appsettings.json" />
+      <_ContentIncludedByDefault Remove="out\appsettings.Production.json" />
+      <_ContentIncludedByDefault Remove="out\SupplierManagement.deps.json" />
+      <_ContentIncludedByDefault Remove="out\SupplierManagement.runtimeconfig.json" />
     </ItemGroup>
 
 </Project>

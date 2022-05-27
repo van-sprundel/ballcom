@@ -26,8 +26,8 @@ public class PaymentController : Controller
     }
 
     [HttpPost]
-    [Route("{customerId}/order/{orderId}/pay")]
-    public async Task<IActionResult> PayOrder(int customerId, int orderId)
+    [Route("order/{orderId}/pay")]
+    public async Task<IActionResult> PayOrder( int orderId)
     {
         var order = await _dbContext.Orders.FindAsync(orderId);
 
@@ -41,7 +41,7 @@ public class PaymentController : Controller
 
         var invoice = new Invoice()
         {
-            CustomerId = customerId,
+            CustomerId = order.CustomerId,
             OrderId = orderId
         };
 

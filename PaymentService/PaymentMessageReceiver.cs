@@ -65,22 +65,29 @@ public class PaymentMessageReceiver : MessageReceiver
                 {
                     case EventType.Created:
                     {
-                        _paymentServiceDbContext.Orders.Add(order);
+                        var o = new Order()
+                        {
+                            CustomerId = order.CustomerId,
+                            IsPaid = order.IsPaid,
+                            OrderId = order.OrderId,
+                            StatusProcess = order.StatusProcess
+                        };
+                        _paymentServiceDbContext.Orders.Add(o);
                         break;
                     }
                     case EventType.Updated:
                     {
                         _paymentServiceDbContext.Orders.Update(order);
-                        _paymentServiceDbContext.SaveChanges();
                         break;
                     }
                     case EventType.Deleted:
                     {
                         _paymentServiceDbContext.Orders.Remove(order);
-                        _paymentServiceDbContext.SaveChanges();
                         break;
                     }
                 }
+
+                _paymentServiceDbContext.SaveChanges();
                 // if (de.Destination == "orderpicker_exchange" &&
                 //     de.Type == EventType.Created &&
                 //     !order.IsPaid)

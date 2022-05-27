@@ -9,4 +9,7 @@ public class Order : IDomainModel
 
     public bool IsPaid { get; set; }
     public StatusProcess StatusProcess { get; set; }
+
+    public int CustomerId { get; set; }
+
 }

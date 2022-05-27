@@ -47,7 +47,7 @@ public class InventoryController : Controller
 
         return Ok(new ProductViewModel
         {
-            Id = x.ProductId,
+            Id = product.ProductId,
             Name = product.Name,
             Price = product.Price,
             Quantity = product.Quantity

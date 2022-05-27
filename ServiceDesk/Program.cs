@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using ServiceDesk;
 using ServiceDesk.DataAccess;
+using SupplierManagement.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,9 +59,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    var context = services.GetRequiredService<ServiceDeskDbContext>();
+    var context = services.GetRequiredService<SupplierManagementDbContext>();
     if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
 }
-
-
 app.Run();
