@@ -163,7 +163,7 @@ public class ServiceDeskController : Controller
             if (ModelState.IsValid)
             {
                 var ticket = new Ticket
-                {
+                {   
                     TicketText = form.TicketText,
                     CustomerId = form.CustomerId,
                     Status = form.Status

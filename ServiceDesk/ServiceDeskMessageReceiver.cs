@@ -11,7 +11,7 @@ public class ServiceDeskMessageReceiver : MessageReceiver
     private readonly ServiceDeskDbContext _dbContext;
 
     public ServiceDeskMessageReceiver(IConnection connection, ServiceDeskDbContext dbContext) : base(connection,
-        new[] { "customer" })
+        new[] { "servicedesk" })
     {
         _dbContext = dbContext;
     }
@@ -28,8 +28,13 @@ public class ServiceDeskMessageReceiver : MessageReceiver
                         $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
                     if (de.Type == EventType.Updated)
                     {
-                        // Update het order.
-                        _dbContext.Customers.Add(c);
+                        var customer = new Customer()
+                        {
+                            Email = c.Email,
+                            CustomerId = c.CustomerId,
+                            LastName = c.LastName
+                        };
+                        _dbContext.Customers.Add(customer);
                         _dbContext.SaveChanges();
                     }
 
