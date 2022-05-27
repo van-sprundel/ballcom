@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Orderpicker.DataAccess;
 using Orderpicker.Models;
-using BallCore.Enums;
 
 namespace Orderpicker.Controllers;
 
@@ -30,10 +29,7 @@ public class OrderpickerController : Controller
     public async Task<IActionResult> GetOrderAsync(int id)
     {
         var order = await _dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == id);
-        if (order == null)
-        {
-            return NotFound();
-        }
+        if (order == null) return NotFound();
 
         return Ok(order);
     }
@@ -52,10 +48,7 @@ public class OrderpickerController : Controller
     public async Task<IActionResult> GetProductAsync(int id)
     {
         var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
-        if (product == null)
-        {
-            return NotFound();
-        }
+        if (product == null) return NotFound();
 
         return Ok(product);
     }
@@ -64,17 +57,14 @@ public class OrderpickerController : Controller
     [Route("update")]
     public async Task<IActionResult> UpdateStatus(OrderUpdateform form)
     {
-        var order = await this._dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == form.Id);
+        var order = await _dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == form.Id);
 
-        if (order == null)
-        {
-            return this.NotFound();
-        }
+        if (order == null) return NotFound();
 
         order.Status = form.Status;
 
-        this._dbContext.Set<Order>().Update(order);
+        _dbContext.Set<Order>().Update(order);
 
-        return this.Ok();
+        return Ok();
     }
 }

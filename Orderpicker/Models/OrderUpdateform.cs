@@ -1,10 +1,9 @@
 ﻿using BallCore.Enums;
 
-namespace Orderpicker.Controllers
+namespace Orderpicker.Controllers;
+
+public class OrderUpdateform
 {
-    public class OrderUpdateform
-    {
-        public int Id { get; set; }
-        public StatusProcess Status { get; set;}
-    }
+    public int Id { get; set; }
+    public StatusProcess Status { get; set; }
 }

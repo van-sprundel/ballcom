@@ -1,7 +1,5 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
-using Microsoft.EntityFrameworkCore;
-using OrderManagement.Controllers;
 using OrderManagement.DataAccess;
 using OrderManagement.Models;
 using RabbitMQ.Client;
@@ -24,7 +22,6 @@ public class OrderMessageReceiver : MessageReceiver
     {
         Console.WriteLine("Received message");
         if (e is DomainEvent de)
-        {
             switch (de.Payload)
             {
                 case Order c:
@@ -52,7 +49,7 @@ public class OrderMessageReceiver : MessageReceiver
                         $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
                     if (de.Type == EventType.Created)
                     {
-                        var customer = new Customer()
+                        var customer = new Customer
                         {
                             CustomerId = c.CustomerId,
                             Email = c.Email
@@ -66,7 +63,7 @@ public class OrderMessageReceiver : MessageReceiver
                     {
                         var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                         if (customer == null) break;
-                        
+
                         _dbContext.Customers.Remove(customer);
                         _dbContext.SaveChanges();
                         break;
@@ -76,11 +73,10 @@ public class OrderMessageReceiver : MessageReceiver
                     {
                         var customer = _dbContext.Customers.FirstOrDefault(cu => cu.CustomerId == c.CustomerId);
                         if (customer == null) break;
-                        
+
                         customer.Email = c.Email;
                         _dbContext.Customers.Update(customer);
                         _dbContext.SaveChanges();
-                        break;
                     }
 
                     break;
@@ -111,13 +107,11 @@ public class OrderMessageReceiver : MessageReceiver
                         // Update het product
                         _dbContext.Products.Update(c);
                         _dbContext.SaveChangesAsync();
-                        break;
                     }
 
                     break;
                 }
             }
-        }
 
         return Task.CompletedTask;
     }

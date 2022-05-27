@@ -8,8 +8,8 @@ namespace PaymentService;
 
 public class PaymentMessageReceiver : MessageReceiver
 {
-    private readonly PaymentServiceDbContext _paymentServiceDbContext;
     private readonly IMessageSender _messageSender;
+    private readonly PaymentServiceDbContext _paymentServiceDbContext;
 
     public PaymentMessageReceiver(IConnection connection,
         PaymentServiceDbContext paymentServiceDbContext, IMessageSender messageSender) : base(connection,
@@ -29,7 +29,7 @@ public class PaymentMessageReceiver : MessageReceiver
             {
                 if (de.Type == EventType.Created)
                 {
-                    var customer = new Customer()
+                    var customer = new Customer
                     {
                         Email = c.Email,
                         CustomerId = c.CustomerId,
@@ -42,10 +42,7 @@ public class PaymentMessageReceiver : MessageReceiver
                 {
                     var customer =
                         _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
-                    if (customer == null)
-                    {
-                        break;
-                    }
+                    if (customer == null) break;
 
                     _paymentServiceDbContext.Customers.Update(customer);
                     _paymentServiceDbContext.SaveChanges();
@@ -53,10 +50,7 @@ public class PaymentMessageReceiver : MessageReceiver
                 else if (de.Type == EventType.Deleted)
                 {
                     var customer = _paymentServiceDbContext.Customers.FirstOrDefault(x => x.CustomerId == c.CustomerId);
-                    if (customer == null)
-                    {
-                        break;
-                    }
+                    if (customer == null) break;
 
                     _paymentServiceDbContext.Customers.Remove(customer);
                     _paymentServiceDbContext.SaveChanges();
@@ -105,10 +99,8 @@ public class PaymentMessageReceiver : MessageReceiver
                     de.Type == EventType.Updated &&
                     order.StatusProcess == StatusProcess.Arrived &&
                     !order.IsPaid)
-                {
                     //send notification to notificationservice so customer gets an email
                     _messageSender.Send(new DomainEvent(order, EventType.Updated, "notificationservice"));
-                }
 
                 break;
             }

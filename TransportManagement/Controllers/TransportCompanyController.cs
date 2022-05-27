@@ -20,16 +20,14 @@ public class TransportCompanyController : Controller
     {
         return Ok(await _dbContext.TransportCompanies.ToListAsync());
     }
-    
+
     [HttpGet]
     [Route("{companyId}", Name = "GetByCompanyId")]
     public async Task<IActionResult> GetByCompanyId(int companyId)
     {
-        var transportCompany = await _dbContext.TransportCompanies.FirstOrDefaultAsync(t => t.TransportCompanyId == companyId);
-        if (transportCompany == null)
-        {
-            return NotFound();
-        }
+        var transportCompany =
+            await _dbContext.TransportCompanies.FirstOrDefaultAsync(t => t.TransportCompanyId == companyId);
+        if (transportCompany == null) return NotFound();
         return Ok(transportCompany);
     }
 
@@ -38,10 +36,7 @@ public class TransportCompanyController : Controller
     public async Task<IActionResult> GetLowestPrice()
     {
         var transportCompany = await _dbContext.TransportCompanies.OrderBy(tc => tc.PricePerKm).FirstOrDefaultAsync();
-        if (transportCompany == null)
-        {
-            return NotFound();
-        }
+        if (transportCompany == null) return NotFound();
         return Ok(transportCompany);
     }
 
@@ -50,12 +45,9 @@ public class TransportCompanyController : Controller
     {
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
-            TransportCompany transportCompany = new TransportCompany
+            var transportCompany = new TransportCompany
             {
                 Name = form.Name,
                 PricePerKm = form.PricePerKm
@@ -80,16 +72,12 @@ public class TransportCompanyController : Controller
     {
         try
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            if (!ModelState.IsValid) return BadRequest();
 
-            var existingCompany = _dbContext.TransportCompanies.FirstOrDefault(tc => tc.TransportCompanyId == companyId);
+            var existingCompany =
+                _dbContext.TransportCompanies.FirstOrDefault(tc => tc.TransportCompanyId == companyId);
             if (existingCompany == null)
-            {
                 return StatusCode(StatusCodes.Status404NotFound, "Transport Company not found.");
-            }
 
             existingCompany.Name = form.Name;
             existingCompany.PricePerKm = form.PricePerKm;
@@ -111,25 +99,18 @@ public class TransportCompanyController : Controller
     {
         try
         {
-            var existingCompany = await _dbContext.TransportCompanies.FirstOrDefaultAsync(tc => tc.TransportCompanyId == companyId);
-            if (existingCompany == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, "Company could not be found");
-            }
+            var existingCompany =
+                await _dbContext.TransportCompanies.FirstOrDefaultAsync(tc => tc.TransportCompanyId == companyId);
+            if (existingCompany == null) return StatusCode(StatusCodes.Status404NotFound, "Company could not be found");
 
             _dbContext.TransportCompanies.Remove(existingCompany);
             await _dbContext.SaveChangesAsync();
 
             return StatusCode(StatusCodes.Status204NoContent);
-
         }
-        catch (DbUpdateException )
+        catch (DbUpdateException)
         {
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
-    
-
-
-
 }

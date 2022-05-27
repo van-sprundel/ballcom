@@ -7,9 +7,8 @@ public class OrderManagementDbContext : DbContext
 {
     public OrderManagementDbContext(DbContextOptions<OrderManagementDbContext> options) : base(options)
     {
-        
     }
-    
+
     public DbSet<Order> Orders { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<OrderProduct> OrderProduct { get; set; }
@@ -28,5 +27,4 @@ public class OrderManagementDbContext : DbContext
             .WithMany(p => p.OrderProducts)
             .HasForeignKey(op => op.ProductId);
     }
-    
 }

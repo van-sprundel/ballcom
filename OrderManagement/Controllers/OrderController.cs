@@ -20,7 +20,7 @@ public class OrderController : Controller
         _dbContext = dbContext;
         _rmq = rmq;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
@@ -52,6 +52,7 @@ public class OrderController : Controller
                 {
                     return StatusCode(StatusCodes.Status404NotFound, "Customer does not exist");
                 }
+
                 Order order = new Order
                 {
                     CustomerId = form.CustomerId,
@@ -60,7 +61,7 @@ public class OrderController : Controller
                     OrderDate = DateTime.Now,
                     StatusProcess = StatusProcess.Pending,
                     Price = 0,
-                    IsPaid = false,
+                    IsPaid = false
                 };
                 // insert order
                 _dbContext.Orders.Add(order);
@@ -71,6 +72,7 @@ public class OrderController : Controller
                 // return result
                 return CreatedAtRoute("GetByOrderId", new { orderId = order.OrderId }, order);
             }
+
             return BadRequest();
         }
         catch (DbUpdateException)
@@ -86,23 +88,26 @@ public class OrderController : Controller
     {
         try
         {
-            int amountProducts =  _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
+            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
             if (amountProducts < 20)
             {
-                var order =  await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
+                var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
                 var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
-                if (product != null && order != null )
+                if (product != null && order != null)
                 {
                     if (order.StatusProcess != StatusProcess.Pending)
                     {
-                        return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+                        return StatusCode(StatusCodes.Status403Forbidden,
+                            "Order has already been submitted. No changes allowed.");
                     }
+
                     if (product.Quantity < 1)
                     {
                         return StatusCode(StatusCodes.Status410Gone, "Order is out of stock");
                     }
-                    var orderProduct = new OrderProduct 
-                    { 
+
+                    var orderProduct = new OrderProduct
+                    {
                         OrderId = orderNumber,
                         ProductId = productNumber
                     };
@@ -118,23 +123,24 @@ public class OrderController : Controller
                         OrderId = orderProduct.OrderId,
                         ProductId = orderProduct.ProductId
                     };
-                    
-                    _rmq.Send(new DomainEvent(orderProductView, EventType.Created, "order_exchange_order_product", true));
+
+                    _rmq.Send(
+                        new DomainEvent(orderProductView, EventType.Created, "order_exchange_order_product", true));
 
                     // return result
                     return Ok();
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, "ProductNumber or OrderNumber could not be found.");
-                } 
+                    return StatusCode(StatusCodes.Status404NotFound,
+                        "ProductNumber or OrderNumber could not be found.");
+                }
             }
             else
             {
-                return StatusCode(StatusCodes.Status412PreconditionFailed, "This order already contains 20 products, more are not allowed.");
-
+                return StatusCode(StatusCodes.Status412PreconditionFailed,
+                    "This order already contains 20 products, more are not allowed.");
             }
-
         }
         catch (DbUpdateException)
         {
@@ -154,11 +160,13 @@ public class OrderController : Controller
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Order was not found.");
             }
+
             if (order.StatusProcess != StatusProcess.Pending)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+                return StatusCode(StatusCodes.Status403Forbidden,
+                    "Order has already been submitted. No changes allowed.");
             }
-            
+
             var orderProducts = _dbContext.OrderProduct.Where(op => op.OrderId == orderNumber);
             if (!orderProducts.Any())
             {
@@ -168,7 +176,7 @@ public class OrderController : Controller
             order.StatusProcess = StatusProcess.Collecting;
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();
-            
+
             // Send event
             _rmq.Send(new DomainEvent(order, EventType.Updated, "order_exchange_order", true));
 
@@ -188,28 +196,30 @@ public class OrderController : Controller
         try
         {
             var orderProduct = await _dbContext.OrderProduct.FirstOrDefaultAsync(op =>
-                    op.OrderId == orderNumber && op.ProductId == productNumber);
-            var order =  await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
+                op.OrderId == orderNumber && op.ProductId == productNumber);
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
             var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
             // Remove
             if (orderProduct != null && order != null && product != null)
             {
                 if (order.StatusProcess != StatusProcess.Pending)
                 {
-                    return StatusCode(StatusCodes.Status403Forbidden, "Order has already been submitted. No changes allowed.");
+                    return StatusCode(StatusCodes.Status403Forbidden,
+                        "Order has already been submitted. No changes allowed.");
                 }
+
                 order.Price -= product.Price;
                 _dbContext.OrderProduct.Remove(orderProduct);
                 _dbContext.Orders.Update(order);
                 await _dbContext.SaveChangesAsync();
-                
+
                 OrderProductViewModel orderProductView = new OrderProductViewModel()
                 {
                     OrderProductId = orderProduct.ProductId,
                     OrderId = orderProduct.OrderId,
                     ProductId = orderProduct.ProductId
                 };
-                
+
                 _rmq.Send(new DomainEvent(orderProductView, EventType.Deleted, "order_exchange_order_product", true));
 
                 // return result
@@ -225,6 +235,5 @@ public class OrderController : Controller
             ModelState.AddModelError("", "Unable to save changes.");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-    } 
-
+    }
 }

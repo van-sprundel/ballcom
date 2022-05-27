@@ -3,7 +3,7 @@ namespace BallCore.Events;
 public class RawEvent : IEvent
 {
     /// <summary>
-    /// Create new RawEvent
+    ///     Create new RawEvent
     /// </summary>
     /// <param name="payload">The binary payload</param>
     /// <param name="name">The command/event name</param>
@@ -17,10 +17,11 @@ public class RawEvent : IEvent
         UseExchange = useExchange;
     }
 
+    public byte[] Data { get; }
+
     public string Destination { get; }
     public bool UseExchange { get; }
     public string Name { get; }
-    public byte[] Data { get; }
 
     public byte[] Serialize()
     {

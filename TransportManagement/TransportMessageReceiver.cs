@@ -10,7 +10,7 @@ public class TransportMessageReceiver : MessageReceiver
 {
     private readonly TransportManagementDbContext _dbContext;
 
-    public TransportMessageReceiver(IConnection connection, TransportManagementDbContext dbContext) : 
+    public TransportMessageReceiver(IConnection connection, TransportManagementDbContext dbContext) :
         base(connection, new[] { "transport_management" })
     {
         _dbContext = dbContext;
@@ -20,12 +20,12 @@ public class TransportMessageReceiver : MessageReceiver
     {
         Console.WriteLine("Received message");
         if (e is DomainEvent de)
-        {
             switch (de.Payload)
             {
                 case Order c:
                 {
-                    Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
+                    Console.WriteLine(
+                        $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.ArrivalAdress}");
                     if (de.Type == EventType.Created)
                     {
                         _dbContext.Orders.Add(c);
@@ -44,13 +44,12 @@ public class TransportMessageReceiver : MessageReceiver
                     {
                         _dbContext.Orders.Update(c);
                         _dbContext.SaveChanges();
-                        break;
                     }
+
                     break;
                 }
             }
-        }
+
         return Task.CompletedTask;
     }
-
 }

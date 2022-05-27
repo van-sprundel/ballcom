@@ -1,9 +1,8 @@
-﻿namespace InventoryManagement.Models
+﻿namespace InventoryManagement.Models;
+
+public class ProductCreateForm
 {
-    public class ProductCreateForm
-    {
-        public string Name { get; set; }
-        public int Quantity { get; set; }
-        public double Price { get; set; }
-    }
+    public string Name { get; set; }
+    public int Quantity { get; set; }
+    public double Price { get; set; }
 }

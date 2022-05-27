@@ -28,23 +28,17 @@ public class PaymentController : Controller
     public async Task<IActionResult> PayOrder(int orderId)
     {
         var order = await _dbContext.Orders.FindAsync(orderId);
-        
-        if (order == null)
-        {
-            return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
-        }
 
-        if (order.IsPaid)
-        {
-            return await Task.FromResult(new StatusCodeResult(304));
-        }
+        if (order == null) return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
+
+        if (order.IsPaid) return await Task.FromResult(new StatusCodeResult(304));
 
         order.IsPaid = true;
         _dbContext.Orders.Update(order);
         await _dbContext.SaveChangesAsync();
-        
+
         //TODO create invoice
-        _rmq.Send(new DomainEvent(order,EventType.Updated,"order_paid_exchange",true));
+        _rmq.Send(new DomainEvent(order, EventType.Updated, "order_paid_exchange", true));
 
         return await Task.FromResult(new OkObjectResult(order));
     }

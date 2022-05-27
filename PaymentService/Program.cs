@@ -22,7 +22,7 @@ if (!isDevelopment)
 {
     var connection = new ConnectionFactory
     {
-        HostName = isDevelopment ? "localhost" : "rabbitmq" ,
+        HostName = isDevelopment ? "localhost" : "rabbitmq",
         Port = 5672,
         UserName = "Rathalos",
         Password = "1234",
@@ -35,8 +35,8 @@ if (!isDevelopment)
 // each exchange needs to know which queues it's going to send data to
     var exchanges = new Dictionary<string, IEnumerable<string>>
     {
-        { "payment_exchange", new []{ "payment", "customer" } },
-        { "order_paid_exchange", new []{ "order_management" } },
+        { "payment_exchange", new[] { "payment", "customer" } },
+        { "order_paid_exchange", new[] { "order_management" } }
     };
 
     builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));

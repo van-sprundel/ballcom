@@ -1,12 +1,12 @@
-﻿namespace SupplierManagement.Models;
-
+﻿using System.ComponentModel.DataAnnotations;
 using BallCore;
-using System.ComponentModel.DataAnnotations;
+
+namespace SupplierManagement.Models;
 
 public class Product : IDomainModel
 {
-    [Key]
-    public int ProductId { get; set; }
+    [Key] public int ProductId { get; set; }
+
     public string Name { get; set; }
     public int SupplierId { get; set; }
     public Supplier Supplier { get; set; }

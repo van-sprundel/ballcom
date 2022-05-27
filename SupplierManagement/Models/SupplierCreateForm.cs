@@ -1,8 +1,7 @@
-﻿namespace SupplierManagement.Models
+﻿namespace SupplierManagement.Models;
+
+public class SupplierCreateForm
 {
-    public class SupplierCreateForm
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
+    public string Name { get; set; }
+    public string Email { get; set; }
 }

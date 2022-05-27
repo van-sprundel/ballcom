@@ -1,18 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using BallCore.Events;
 using BallCore.RabbitMq;
-using BallCore.Events;
 using InventoryManagement.DataAccess;
 using InventoryManagement.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Controllers;
 
 [Route("/api/[controller]")]
 public class InventoryController : Controller
 {
-    InventoryManagementDbContext _dbContext;
-    IMessageSender _messageSender;
+    private readonly InventoryManagementDbContext _dbContext;
+    private readonly IMessageSender _messageSender;
 
     public InventoryController(InventoryManagementDbContext dbContext, IMessageSender messageSender)
     {
@@ -31,7 +31,7 @@ public class InventoryController : Controller
                 Quantity = x.Quantity
             }).ToListAsync();
 
-        return this.Ok(products);
+        return Ok(products);
     }
 
     [HttpGet]
@@ -42,12 +42,9 @@ public class InventoryController : Controller
             .Set<Product>()
             .FindAsync(productId);
 
-        if (product == null)
-        {
-            return NotFound("Couldn't find product");
-        }
+        if (product == null) return NotFound("Couldn't find product");
 
-        return this.Ok(new ProductViewModel
+        return Ok(new ProductViewModel
         {
             Name = product.Name,
             Price = product.Price,
@@ -63,11 +60,8 @@ public class InventoryController : Controller
             .Set<Product>()
             .FirstOrDefaultAsync(c => c.ProductId == id);
 
-        if (product == null)
-        {
-            return NotFound("Couldn't find product");
-        }
-        return this.Ok(product);
+        if (product == null) return NotFound("Couldn't find product");
+        return Ok(product);
     }
 
     [AllowAnonymous]
@@ -115,12 +109,9 @@ public class InventoryController : Controller
     [Route("update")]
     public async Task<IActionResult> Update([FromBody] ProductUpdateForm form)
     {
-        var product = await this._dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.ProductId);
+        var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.ProductId);
 
-        if (product == null)
-        {
-            return this.NotFound();
-        }
+        if (product == null) return NotFound();
 
         //Update product
         product.Quantity = form.Quantity;

@@ -5,7 +5,6 @@ using OrderManagement;
 using OrderManagement.DataAccess;
 using RabbitMQ.Client;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // add DBContext
@@ -29,8 +28,8 @@ builder.Services.AddSingleton(connection);
 // each exchange needs to know which queues it's going to send data to
 var exchanges = new Dictionary<string, IEnumerable<string>>
 {
-    { "order_exchange_order", new []{ "orderpicker_client", "transport_management", "notifications", "payment" } },
-    { "order_exchange_order_product", new []{ "orderpicker_client" } },
+    { "order_exchange_order", new[] { "orderpicker_client", "transport_management", "notifications", "payment" } },
+    { "order_exchange_order_product", new[] { "orderpicker_client" } }
 };
 
 builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -49,14 +48,11 @@ builder.Services
 
 // Setup MVC
 builder.Services.AddControllers();
-    
+
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();

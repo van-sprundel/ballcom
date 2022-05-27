@@ -1,5 +1,4 @@
 using BallCore.RabbitMq;
-using InventoryManagement;
 using InventoryManagement.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
@@ -30,7 +29,7 @@ if (!isDevelopment)
 //Inject ExchangeDeclarator
     var exchanges = new Dictionary<string, IEnumerable<string>>
     {
-        { "inventory_exchange", new [] { "orderpicker_client", "order_management" } }
+        { "inventory_exchange", new[] { "orderpicker_client", "order_management" } }
     };
 
     builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -51,10 +50,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();
@@ -69,10 +65,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<InventoryManagementDbContext>();
-    if (context.Database.GetPendingMigrations().Any())
-    {
-        context.Database.Migrate();
-    }
+    if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
 }
 
 Console.WriteLine("Starting application");

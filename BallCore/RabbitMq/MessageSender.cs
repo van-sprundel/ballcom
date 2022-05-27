@@ -4,7 +4,7 @@ using RabbitMQ.Client;
 namespace BallCore.RabbitMq;
 
 /// <summary>
-/// Default sender implementation
+///     Default sender implementation
 /// </summary>
 public class MessageSender : IMessageSender, IDisposable
 {
@@ -19,8 +19,14 @@ public class MessageSender : IMessageSender, IDisposable
         _declaredQueues = new List<string>();
     }
 
+    public void Dispose()
+    {
+        Console.WriteLine("Stopping RabbitMq service");
+        _channel?.Dispose();
+    }
+
     /// <summary>
-    /// Send message to RabbitMQ broker
+    ///     Send message to RabbitMQ broker
     /// </summary>
     /// <param name="e">The event to send</param>
     public void Send(IEvent e)
@@ -33,19 +39,14 @@ public class MessageSender : IMessageSender, IDisposable
 
         if (!e.UseExchange && !_declaredQueues.Contains(e.Destination))
         {
-            _channel.QueueDeclare(queue: e.Destination, durable: true, exclusive: false, autoDelete: false,
-                arguments: null);
+            _channel.QueueDeclare(e.Destination, true, false, false,
+                null);
             _declaredQueues.Add(e.Destination);
         }
 
         //Publish message to queue
-        _channel.BasicPublish(exchange: e.UseExchange ? e.Destination : "", e.UseExchange ? "" : e.Destination, basicProperties: props, body: e.Serialize(),
+        _channel.BasicPublish(e.UseExchange ? e.Destination : "", e.UseExchange ? "" : e.Destination,
+            basicProperties: props, body: e.Serialize(),
             mandatory: true);
-    }
-
-    public void Dispose()
-    {
-        Console.WriteLine("Stopping RabbitMq service");
-        _channel?.Dispose();
     }
 }

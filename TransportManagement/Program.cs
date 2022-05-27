@@ -30,7 +30,7 @@ if (!isDevelopment)
 // each exchange needs to know which queues it's going to send data to
     var exchanges = new Dictionary<string, IEnumerable<string>>
     {
-        { "transport_exchange_order", new[] { "order_management" } },
+        { "transport_exchange_order", new[] { "order_management" } }
     };
 
     builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));
@@ -51,10 +51,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
 app.UseMvc();
 app.UseDefaultFiles();

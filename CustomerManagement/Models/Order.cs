@@ -1,5 +1,4 @@
-﻿
-using BallCore;
+﻿using BallCore;
 
 namespace CustomerManagement.Models;
 

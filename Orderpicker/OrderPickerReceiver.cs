@@ -13,7 +13,7 @@ public class OrderPickerReceiver : MessageReceiver
     public OrderPickerReceiver(OrderpickerDbContext dbContext, IConnection connection) : base(connection,
         new[] { "orderpicker_client", "general" })
     {
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
     // Example of how to handle message
@@ -22,17 +22,13 @@ public class OrderPickerReceiver : MessageReceiver
         Console.WriteLine("Received message");
 
         if (e is DomainEvent de)
-        {
             switch (de.Payload)
             {
                 case Product c:
                 {
                     Console.WriteLine(
                         $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
-                    if (de.Type == EventType.Created)
-                    {
-                        this._dbContext.Set<Product>().Add(c);
-                    }
+                    if (de.Type == EventType.Created) _dbContext.Set<Product>().Add(c);
 
                     break;
                 }
@@ -40,15 +36,11 @@ public class OrderPickerReceiver : MessageReceiver
                 {
                     Console.WriteLine(
                         $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination}");
-                    if (de.Type == EventType.Created)
-                    {
-                        this._dbContext.Set<Order>().Add(o);
-                    }
+                    if (de.Type == EventType.Created) _dbContext.Set<Order>().Add(o);
 
                     break;
                 }
             }
-        }
 
         return Task.CompletedTask;
     }

@@ -1,5 +1,4 @@
-﻿using System;
-namespace CustomerManagement.Models;
+﻿namespace CustomerManagement.Models;
 
 public class CreateCustomerForm
 {
