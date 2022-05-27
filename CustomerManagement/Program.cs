@@ -7,10 +7,9 @@ using CustomerManagement.Models;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// add DBContext
+// Add DBContext
 var mariaDbConnectionString = builder.Configuration.GetConnectionString("MariaDbConnectionString");
 builder.Services.AddDbContext<CustomerManagementDbContext>(options =>
     options.UseMySql(mariaDbConnectionString, ServerVersion.AutoDetect(mariaDbConnectionString)));
@@ -78,7 +77,6 @@ using (var scope = app.Services.CreateScope())
         context.Database.Migrate();
     }
 }
-
 
 Console.WriteLine("Starting application");
 app.Run();

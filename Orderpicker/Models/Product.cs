@@ -1,6 +1,8 @@
-﻿namespace Orderpicker.Models;
+﻿using BallCore;
 
-public class Product
+namespace Orderpicker.Models;
+
+public class Product : IDomainModel
 {
     public int Id { get; set; }
     public string Name { get; set; }

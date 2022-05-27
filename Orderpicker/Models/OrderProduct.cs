@@ -1,6 +1,9 @@
+using BallCore;
+using BallCore.Events;
+
 namespace Orderpicker.Models;
 
-public class OrderProduct
+public class OrderProduct : IDomainModel
 {
     public int OrderProductId { get; set; }
     public int OrderId { get; set; }
