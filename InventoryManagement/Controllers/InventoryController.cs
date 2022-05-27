@@ -72,46 +72,6 @@ public class InventoryController : Controller
 
     [AllowAnonymous]
     [HttpPost]
-    [Route("create")]
-    public async Task<IActionResult> Create([FromBody] ProductCreateForm form)
-    {
-        try
-        {
-            if (ModelState.IsValid)
-            {
-                var product = new Product
-                {
-                    Name = form.Name,
-                    Price = form.Price,
-                    Quantity = form.Quantity
-                };
-
-                // insert product
-                _dbContext
-                    .Set<Product>()
-                    .Add(product);
-
-                await _dbContext.SaveChangesAsync();
-
-                //TODO: send event
-                _messageSender.Send(new DomainEvent(product, EventType.Created, "inventory_exchange", true));
-
-                // return result
-                return CreatedAtRoute("GetByProductId", new { customerId = product.ProductId }, product);
-            }
-
-            return BadRequest();
-        }
-        catch (DbUpdateException)
-        {
-            ModelState.AddModelError("", "Unable to save changes. ");
-            return StatusCode(StatusCodes.Status500InternalServerError);
-            throw;
-        }
-    }
-
-    [AllowAnonymous]
-    [HttpPost]
     [Route("update")]
     public async Task<IActionResult> Update([FromBody] ProductUpdateForm form)
     {
