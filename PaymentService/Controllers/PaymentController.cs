@@ -2,9 +2,11 @@
 using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using PaymentService.DataAccess;
+using PaymentService.Models;
 
 namespace PaymentService.Controllers;
 
+[Route("/api/[controller]")]
 public class PaymentController : Controller
 {
     private readonly PaymentServiceDbContext _dbContext;
@@ -24,8 +26,8 @@ public class PaymentController : Controller
     }
 
     [HttpPost]
-    [Route("api/order/{orderId}/pay")]
-    public async Task<IActionResult> PayOrder(int orderId)
+    [Route("{customerId}/order/{orderId}/pay")]
+    public async Task<IActionResult> PayOrder(int customerId, int orderId)
     {
         var order = await _dbContext.Orders.FindAsync(orderId);
 
@@ -37,9 +39,30 @@ public class PaymentController : Controller
         _dbContext.Orders.Update(order);
         await _dbContext.SaveChangesAsync();
 
-        //TODO create invoice
+        var invoice = new Invoice()
+        {
+            CustomerId = customerId,
+            OrderId = orderId
+        };
+
+        await _dbContext.Invoices.AddAsync(invoice);
+        await _dbContext.SaveChangesAsync();
+
         _rmq.Send(new DomainEvent(order, EventType.Updated, "order_paid_exchange", true));
 
         return await Task.FromResult(new OkObjectResult(order));
+    }
+
+    [HttpGet]
+    [Route("{customerId}/invoices")]
+    public async Task<IActionResult> GetInvoices(int customerId)
+    {
+        var customer = await _dbContext.Customers.FindAsync(customerId);
+
+        if (customer == null) return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
+        
+        
+
+        return await Task.FromResult(Ok("test"));
     }
 }
