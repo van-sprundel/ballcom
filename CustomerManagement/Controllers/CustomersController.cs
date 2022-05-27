@@ -67,7 +67,7 @@ public class CustomersController : Controller
         await _dbContext.SaveChangesAsync();
 
         _messageSender.Send(new DomainEvent(customer, EventType.Deleted, "customer_exchange", true));
-        return StatusCode(StatusCodes.Status204NoContent);
+        return Ok();
     }
 
     [HttpPut]

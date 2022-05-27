@@ -43,6 +43,7 @@ public class ProductController : Controller
             .Set<Product>()
             .Select(x => new ProductViewModel
             {
+                Id = x.ProductId,
                 Name = x.Name,
                 Supplier = x.Supplier,
             })

@@ -4,6 +4,7 @@ using BallCore.RabbitMq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransportManagement.DataAccess;
+using TransportManagement.Models;
 
 namespace TransportManagement.Controllers;
 
@@ -29,27 +30,27 @@ public class OrderController : Controller
     [Route("{orderId}", Name = "GetByOrderId")]
     public async Task<IActionResult> GetByOrderId(int orderId)
     {
-        var order = await _dbContext.Orders.FirstOrDefaultAsync();
+        var order = await _dbContext.Orders.FirstOrDefaultAsync(x => x.OrderId == orderId);
         if (order == null) return NotFound();
 
         return Ok(order);
     }
 
     [HttpPut]
-    [Route("{orderId}/{transportId}", Name = "AddTransportCompanyToOrder")]
-    public async Task<IActionResult> AddTransportCompanyToOrder(int orderId, int transportId)
+    [Route("add-company", Name = "AddTransportCompanyToOrder")]
+    public async Task<IActionResult> AddTransportCompanyToOrder(AddCompanyToOrderForm form)
     {
         try
         {
-            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == form.OrderId);
             var transportCompany =
-                await _dbContext.TransportCompanies.FirstOrDefaultAsync(t => t.TransportCompanyId == transportId);
+                await _dbContext.TransportCompanies.FirstOrDefaultAsync(t => t.TransportCompanyId == form.TransportId);
             if (order == null || transportCompany == null) return NotFound();
 
             if (order.StatusProcess == StatusProcess.Arrived)
                 return StatusCode(StatusCodes.Status403Forbidden, "Order has already arrived.");
 
-            order.TransportCompanyId = transportId;
+            order.TransportCompanyId = form.TransportId;
             _dbContext.Orders.Update(order);
             await _dbContext.SaveChangesAsync();
 

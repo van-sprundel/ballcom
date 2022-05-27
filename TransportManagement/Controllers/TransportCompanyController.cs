@@ -110,7 +110,7 @@ public class TransportCompanyController : Controller
         }
         catch (DbUpdateException)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return Ok();
         }
     }
 }

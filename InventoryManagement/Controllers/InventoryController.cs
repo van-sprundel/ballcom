@@ -26,6 +26,7 @@ public class InventoryController : Controller
         var products = await _dbContext.Set<Product>().Select(
             x => new ProductViewModel
             {
+                Id = x.ProductId,
                 Name = x.Name,
                 Price = x.Price,
                 Quantity = x.Quantity
@@ -46,6 +47,7 @@ public class InventoryController : Controller
 
         return Ok(new ProductViewModel
         {
+            Id = x.ProductId,
             Name = product.Name,
             Price = product.Price,
             Quantity = product.Quantity
@@ -59,12 +61,11 @@ public class InventoryController : Controller
     {
         var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.ProductId);
 
-        if (product == null) return NotFound();
+        if (product == null) return NotFound("Product not found");
 
         //Update product
         product.Quantity = form.Quantity;
         product.Price = form.Price;
-        product.Name = form.Name;
 
         // insert product
         _dbContext.Products.Update(product);
