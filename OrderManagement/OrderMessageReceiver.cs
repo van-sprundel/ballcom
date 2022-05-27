@@ -53,7 +53,7 @@ public class OrderMessageReceiver : MessageReceiver
                     if (de.Type == EventType.Updated)
                     {
                         // Update het order.
-                        var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderId == o.OrderId);
+                        var existingOrder = _dbContext.Orders.FirstOrDefault(order => order.OrderId == o.OrderId);
 
                         if (existingOrder == null)
                             return Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
