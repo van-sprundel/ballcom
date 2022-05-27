@@ -17,7 +17,7 @@ if (!isDevelopment)
 {
     var connection = new ConnectionFactory
     {
-        HostName = isDevelopment ? "localhost" : "rabbitmq",
+        HostName = "rabbitmq",
         Port = 5672,
         UserName = "Rathalos",
         Password = "1234",

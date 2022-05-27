@@ -10,7 +10,7 @@ using NotificationService.DataAccess;
 namespace NotificationService.Migrations
 {
     [DbContext(typeof(NotificationServiceDbContext))]
-    [Migration("20220526111808_init")]
+    [Migration("20220527090619_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

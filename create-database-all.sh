@@ -10,6 +10,9 @@ docker volume create mariadbdata
 docker volume create rabbitmqdata
 
 echo "Creating migrations"
+
+Start-Sleep -Seconds 5
+
 Remove-Item -path "CustomerManagement/Migrations/*" -r
 Remove-Item -path "InventoyManagement/Migrations/*" -r 
 Remove-Item -path "NotifcationService/Migrations/*" -r

@@ -69,6 +69,5 @@ using (var scope = app.Services.CreateScope())
     if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
 }
 
-
 Console.WriteLine("Starting application");
 app.Run();

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SupplierManagement.DataAccess;
 using SupplierManagement.Models;
 
-namespace ProductManagement.Controllers;
+namespace SupplierManagement.Controllers;
 
 [Route("/api/[controller]")]
 public class ProductController : Controller

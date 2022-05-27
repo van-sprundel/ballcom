@@ -39,7 +39,7 @@ namespace TransportManagement.Migrations
                     ArrivalAdress = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     StatusProcess = table.Column<int>(type: "int", nullable: false),
-                    TransportCompanyId = table.Column<int>(type: "int", nullable: false)
+                    TransportCompanyId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -48,8 +48,7 @@ namespace TransportManagement.Migrations
                         name: "FK_Orders_TransportCompanies_TransportCompanyId",
                         column: x => x.TransportCompanyId,
                         principalTable: "TransportCompanies",
-                        principalColumn: "TransportCompanyId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TransportCompanyId");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
