@@ -11,7 +11,7 @@ var connStr = builder.Configuration.GetConnectionString("MariaDbConnectionString
 builder.Services.AddDbContext<EventContext>(options =>
     options.UseMySql(connStr, ServerVersion.AutoDetect(connStr)));
 
-#if DEBUG
+#if !DEBUG
 var connection = new ConnectionFactory
 {
     HostName = "rabbitmq",
@@ -33,7 +33,7 @@ app.MapGet("/order/total-revenue", (EventContext ec) =>
 {
     double totalRevenue = 0;
 
-    foreach (var data in ec.Events.Where(x => x.Name == "UpdateOrder").Select(o => o.Data))
+    foreach (var data in ec.Events.Where(x => x.Name == "Order.Updated").Select(o => o.Data))
     {
         var order = JsonSerializer.Deserialize<Order>(data);
         if (order != null)
