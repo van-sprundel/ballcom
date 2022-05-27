@@ -1,0 +1,1349 @@
+{
+	"info": {
+		"_postman_id": "5d56ad5e-f8f4-42a6-9243-1cf5be489ff7",
+		"name": "Ball.Com tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11073347"
+	},
+	"item": [
+		{
+			"name": "Customermanagement done",
+			"item": [
+				{
+					"name": "POST Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Rathian\",\r\n    \"lastName\": \"Rath\",\r\n    \"city\": \"Forest\",\r\n    \"address\": \"Treetop 23\",\r\n    \"email\": \"ratian@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/customers/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"customers",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"let responseData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"CustomerId\", responseData[responseData.length - 1].customerId);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/customers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Customer by Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/customers/{{CustomerId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"customers",
+								"{{CustomerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Legiana\",\r\n    \"lastName\": \"Ice\",\r\n    \"city\": \"Highlands\",\r\n    \"address\": \"Coral 23\",\r\n    \"email\": \"different@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/customers/{{CustomerId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"customers",
+								"{{CustomerId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/customers/delete/{{CustomerId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"customers",
+								"delete",
+								"{{CustomerId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SupplierManagement",
+			"item": [
+				{
+					"name": "Supplier",
+					"item": [
+						{
+							"name": "Create supplier",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"SupplierId\", responseData.supplierId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Julius\",\r\n    \"Email\": \"vanjulius@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/supplier/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"supplier",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get suppliers",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"SupplierId\", responseData[responseData.length - 1].supplierId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/supplier",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"supplier"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get supplier",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/supplier/{{SupplierId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"supplier",
+										"{{SupplierId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update supplier",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Id\": {{SupplierId}},\r\n    \"Email\": \"vanjulius@gmail.com\",\r\n    \"Name\": \"Julius\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/supplier/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"supplier",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "Add product",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"brood\",\r\n    \"SupplierId\": {{SupplierId}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/product/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"product",
+										"create"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get products",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"ProductId\", responseData[responseData.length - 1].id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/product",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"product"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5007/api/product/{{ProductId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"product",
+										"{{ProductId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update product",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Id\": {{ProductId}},\r\n    \"Name\": \"kaas2\",\r\n    \"SupplierId\": 1 \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5007/api/product/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5007",
+									"path": [
+										"api",
+										"product",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "TransportManagment",
+			"item": [
+				{
+					"name": "TransportCompany",
+					"item": [
+						{
+							"name": "Add TransportCompany",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"vervoerBedrijf\",\r\n    \"PricePerKm\": 21\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get TransportCompany",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"TransportCompanyId\", responseData[responseData.length - 1].transportCompanyId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get TransportCompany By Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany/{{TransportCompanyId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany",
+										"{{TransportCompanyId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put TransportCompany",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"bedrijfVervoer\",\r\n    \"PricePerKm\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany/{{TransportCompanyId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany",
+										"{{TransportCompanyId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get LowestPrice",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "file",
+									"file": {}
+								},
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany/lowestPrice",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany",
+										"lowestPrice"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete TransportCompany",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(204);\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/TransportCompany/{{TransportCompanyId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"TransportCompany",
+										"{{TransportCompanyId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Order",
+					"item": [
+						{
+							"name": "Get Orders",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"Transport_OrderId\", responseData[responseData.length - 1].orderId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/order",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Order By Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/order/{{Transport_OrderId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"order",
+										"{{Transport_OrderId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put change statusprocess",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 202\", function () {\r",
+											"    pm.response.to.have.status(202)\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5008/api/order/{{Transport_OrderId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"order",
+										"{{Transport_OrderId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put add company to order",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"TransportId\": {{TransportCompanyId}},\r\n    \"OrderId\": {{Transport_OrderId}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5008/api/order/add-company",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5008",
+									"path": [
+										"api",
+										"order",
+										"add-company"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "OrderManagement",
+			"item": [
+				{
+					"name": "Customer",
+					"item": [
+						{
+							"name": "Get customer by Id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/customer/{{CustomerId}}",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"customer",
+										"{{CustomerId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"item": [
+						{
+							"name": "Get all products",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"Order_ProductId\", responseData[responseData.length - 1].productId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/product",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"product"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Order",
+					"item": [
+						{
+							"name": "POST Order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"Order_OrderId\", responseData.orderId);\r",
+											"\r",
+											"pm.collectionVariables.set(\"Order_CustomerId\", responseData.customerId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"customerId\": {{CustomerId}},\r\n    \"ArrivalCity\": \"Db\",\r\n    \"ArrivalAdress\": \"Snellestraat\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5003/api/order",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET all Orders",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200)\r",
+											"})\r",
+											"\r",
+											"let responseData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"Order_OrderId\", responseData[responseData.length - 1].orderId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/order",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Product To Order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"OrderId\": {{Order_OrderId}}, //2\r\n    \"ProductId\": {{Order_ProductId}} //1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5003/api/order/add-product",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order",
+										"add-product"
+									],
+									"query": [
+										{
+											"key": "orderNumber",
+											"value": "4",
+											"disabled": true
+										},
+										{
+											"key": "productNumber",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET Order By Id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/order/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Product From Order",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/order/4/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order",
+										"4",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Order",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5003/api/order/submit/9",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5003",
+									"path": [
+										"api",
+										"order",
+										"submit",
+										"9"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "InventoryManagement",
+			"item": [
+				{
+					"name": "get Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/api/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ProductId\": {{ProductId}},\r\n    \"Name\": \"kaas\",\r\n    \"Quantity\": 3,\r\n    \"Price\": 2.00\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5001/api/inventory/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"inventory",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Product by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5001/api/inventory/{{ProductId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5001",
+							"path": [
+								"api",
+								"inventory",
+								"{{ProductId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PaymentService",
+			"item": [
+				{
+					"name": "Pay Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{paymentservice_url}}/api/order/1/pay",
+							"host": [
+								"{{paymentservice_url}}"
+							],
+							"path": [
+								"api",
+								"order",
+								"1",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "CustomerId",
+			"value": "1"
+		},
+		{
+			"key": "ProductId",
+			"value": ""
+		},
+		{
+			"key": "SupplierId",
+			"value": ""
+		},
+		{
+			"key": "TransportCompanyId",
+			"value": ""
+		},
+		{
+			"key": "Order_OrderId",
+			"value": ""
+		},
+		{
+			"key": "Order_CustomerId",
+			"value": ""
+		},
+		{
+			"key": "Transport_OrderId",
+			"value": ""
+		},
+		{
+			"key": "Order_ProductId",
+			"value": ""
+		}
+	]
+}
