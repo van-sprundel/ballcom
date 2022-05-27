@@ -18,15 +18,18 @@ public class SupplierController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        var suppliers = await _dbContext.Set<Supplier>().Select(
-            x => new SupplierViewModel
-            {
-                Name = x.Name,
-                Email = x.Email,
-                Products = x.Products
-            }).ToListAsync();
+        var suppliers = await _dbContext
+            .Set<Supplier>()
+            .Select(
+                x => new SupplierViewModel
+                {
+                    SupplierId = x.SupplierId,
+                    Name = x.Name,
+                    Email = x.Email,
+                    Products = x.Products
+                }).ToListAsync();
 
-        return Ok(await _dbContext.Suppliers.ToListAsync());
+        return Ok(suppliers);
     }
 
 
@@ -38,10 +41,12 @@ public class SupplierController : Controller
             .Set<Supplier>()
             .FirstOrDefaultAsync(c => c.SupplierId == id);
 
-        if (supplier == null) return NotFound("Can't find supplier");
+        if (supplier == null) 
+            return NotFound("Can't find supplier");
 
         return Ok(new SupplierViewModel
         {
+            SupplierId = supplier.SupplierId,
             Name = supplier.Name,
             Email = supplier.Email,
             Products = supplier.Products
@@ -49,8 +54,8 @@ public class SupplierController : Controller
     }
 
     [HttpPost]
-    [Route("add")]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateSupplierViewModel form)
+    [Route("create")]
+    public async Task<IActionResult> CreateAsync([FromBody] SupplierCreateForm form)
     {
         try
         {
@@ -71,6 +76,46 @@ public class SupplierController : Controller
 
                 // return CreatedAtRoute("GetBySupplierId", new { id = supplier.SupplierId }, supplier);
                 return StatusCode(201,supplier);
+            }
+
+            return BadRequest();
+        }
+        catch (DbUpdateException)
+        {
+            ModelState.AddModelError("", "Unable to save changes. ");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+            throw;
+        }
+    }
+
+    [HttpPost]
+    [Route("update")]
+    public async Task<IActionResult> UpdateAsync([FromBody] SupplierUpdateForm form)
+    {
+        try
+        {
+            if (ModelState.IsValid)
+            {
+                var supplier = await this._dbContext
+                    .Set<Supplier>()
+                    .FirstOrDefaultAsync(x => x.SupplierId == form.Id);
+
+                if(supplier == null)
+                {
+                    return this.NotFound("Supplier not found");
+                }
+
+                supplier.Name = form.Name;
+                supplier.Email = form.Email;
+
+                _dbContext
+                    .Set<Supplier>()
+                    .Update(supplier);
+
+                await _dbContext.SaveChangesAsync();
+
+                // return CreatedAtRoute("GetBySupplierId", new { id = supplier.SupplierId }, supplier);
+                return Ok(supplier);
             }
 
             return BadRequest();

@@ -22,17 +22,36 @@ public class ProductController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        return Ok(await _dbContext.Products.ToListAsync());
+        var products = await _dbContext
+            .Set<Product>()
+            .Select(x => new ProductViewModel
+            {
+                Id = x.ProductId,
+                Name = x.Name,
+                Supplier = x.Supplier,
+            })
+            .ToListAsync();
+
+        return Ok(products);
     }
 
     [HttpGet]
-    [Route("{productId}", Name = "GetByProductId")]
-    public async Task<IActionResult> Get(int productId)
+    [Route("{id}", Name = "GetByProductId")]
+    public async Task<IActionResult> Get(int id)
     {
-        var product = await _dbContext.Products.FirstOrDefaultAsync(c => c.ProductId == productId);
-        if (product != null)
-            return Ok(product);
-        return NotFound("Product not found");
+        var product = await _dbContext
+            .Set<Product>()
+            .Select(x => new ProductViewModel
+            {
+                Name = x.Name,
+                Supplier = x.Supplier,
+            })
+            .FirstAsync();
+
+        if (product == null)
+            return NotFound("Product not found");
+
+        return Ok(product);
     }
 
     [HttpPost]
@@ -43,14 +62,25 @@ public class ProductController : Controller
         {
             if (ModelState.IsValid)
             {
+                var supplier = await this._dbContext
+                    .Set<Supplier>()
+                    .FirstOrDefaultAsync(x => x.SupplierId == form.SupplierId);
+
+                if(supplier == null)
+                {
+                    return this.NotFound("Supplier not found");
+                }
+
                 var product = new Product
                 {
                     Name = form.Name,
-                    SupplierId = form.SupplierId
+                    SupplierId = form.SupplierId,
                 };
 
                 // Add product
-                await _dbContext.Products.AddAsync(product);
+                await _dbContext
+                    .Set<Product>()
+                    .AddAsync(product);
 
                 // Save db
                 await _dbContext.SaveChangesAsync();
@@ -75,7 +105,9 @@ public class ProductController : Controller
     [Route("update")]
     public async Task<IActionResult> UpdateAsync([FromBody] ProductUpdateForm form)
     {
-        var product = await _dbContext.Set<Product>().FirstOrDefaultAsync(x => x.ProductId == form.Id);
+        var product = await _dbContext
+            .Set<Product>()
+            .FirstOrDefaultAsync(x => x.ProductId == form.Id);
 
         if (product == null) return NotFound();
 
@@ -90,6 +122,6 @@ public class ProductController : Controller
         // Send event
         _messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management"));
 
-        return Ok();
+        return Ok(product);
     }
 }

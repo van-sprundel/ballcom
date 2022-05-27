@@ -83,16 +83,16 @@ public class OrderController : Controller
     }
 
     [HttpPost]
-    [Route("{orderNumber}/{productNumber}", Name = "AddProductToOrder")]
-    public async Task<IActionResult> AddProductToOrderAsync(int orderNumber, int productNumber)
+    [Route("add-product", Name = "AddProductToOrder")]
+    public async Task<IActionResult> AddProductToOrderAsync(AddProductToOrderForm form)
     {
         try
         {
-            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == orderNumber);
+            int amountProducts = _dbContext.OrderProduct.Count(op => op.OrderId == form.OrderId);
             if (amountProducts < 20)
             {
-                var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
-                var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
+                var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == form.OrderId);
+                var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == form.ProductId);
                 if (product != null && order != null)
                 {
                     if (order.StatusProcess != StatusProcess.Pending)
@@ -108,8 +108,8 @@ public class OrderController : Controller
 
                     var orderProduct = new OrderProduct
                     {
-                        OrderId = orderNumber,
-                        ProductId = productNumber,
+                        OrderId = form.OrderId,
+                        ProductId = form.ProductId,
                         IsPicked = false
                     };
                     order.Price += product.Price;
@@ -192,15 +192,15 @@ public class OrderController : Controller
     }
 
     [HttpDelete]
-    [Route("{orderNumber}/{productNumber}", Name = "RemoveProductFromOrder")]
-    public async Task<IActionResult> RemoveProductFromOrderAsync(int orderNumber, int productNumber)
+    [Route("delete", Name = "RemoveProductFromOrder")]
+    public async Task<IActionResult> RemoveProductFromOrderAsync(RemoveProductFromOrderForm form)
     {
         try
         {
             var orderProduct = await _dbContext.OrderProduct.FirstOrDefaultAsync(op =>
-                op.OrderId == orderNumber && op.ProductId == productNumber);
-            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == orderNumber);
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == productNumber);
+                op.OrderId == form.OrderId && op.ProductId == form.ProductId);
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == form.OrderId);
+            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == form.ProductId);
             // Remove
             if (orderProduct != null && order != null && product != null)
             {

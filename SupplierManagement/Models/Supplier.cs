@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace SupplierManagement.Models;
 
@@ -9,5 +10,6 @@ public class Supplier
     public string Name { get; set; }
     public string Email { get; set; }
 
+    [JsonIgnore]
     public virtual List<Product> Products { get; set; }
 }
