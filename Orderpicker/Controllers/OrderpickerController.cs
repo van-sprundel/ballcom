@@ -104,6 +104,16 @@ public class OrderpickerController : Controller
 
         this._dbContext.Set<OrderProduct>().Update(orderProduct);
 
+        // Send update to inventory management
+        var product = await this._dbContext.Set<Product>().FirstAsync(x => x.Id == orderProduct.Id);
+
+        if (product == null)
+        {
+            return this.NotFound();
+        }
+
+        this._messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management", false));
+
         return this.Ok();
     }
 }

@@ -26,8 +26,22 @@ public class InventoryMessageReceiver : MessageReceiver
                     {
                         Console.WriteLine($"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Name}");
 
-                        // Save product
-                        this._dbContext.Set<Product>().Add(c);
+                        if(de.Type == EventType.Created)
+                        {
+                            // Save product
+                            this._dbContext.Set<Product>().Add(c);
+                            break;
+                        }
+                        if (de.Type == EventType.Updated)
+                        {
+                            // Quantity minus 1;
+                            c.Quantity -= 1;
+
+                            // Save product
+                            this._dbContext.Set<Product>().Update(c);
+                            break;
+                        }
+
                         break;
                     }
             }
