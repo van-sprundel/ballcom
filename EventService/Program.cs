@@ -31,19 +31,18 @@ app.MapGet("/", () => "Hello EventWorld from EventService!");
 
 app.MapGet("/order/total-revenue", (EventContext ec) =>
 {
-    var totalRevenue = 0;
+    double totalRevenue = 0;
 
     foreach (var data in ec.Events.Where(x => x.Name == "UpdateOrder").Select(o => o.Data))
     {
         var order = JsonSerializer.Deserialize<Order>(data);
         if (order != null)
         {
-            totalRevenue += (int)(order.Price * 100);
+            totalRevenue += order.Price;
         }
     }
 
-    var decimalRevenue = (decimal) totalRevenue / 100;
-    return Results.Ok(decimalRevenue);
+    return Results.Ok(totalRevenue);
 });
 
 app.Run();
