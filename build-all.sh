@@ -9,7 +9,8 @@ source ./build.sh Orderpicker &&
 source ./build.sh PaymentService &&
 source ./build.sh ServiceDesk &&
 source ./build.sh SupplierManagement &&
-source ./build.sh TransportManagement
+source ./build.sh TransportManagement &&
+source ./build.sh EventService
 
 echo "Done!"
 echo "Building docker containers with docker-compose"

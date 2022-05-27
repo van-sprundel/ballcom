@@ -17,5 +17,6 @@ dotnet ef database update --project .\Orderpicker
 dotnet ef database update --project .\OrderManagement
 dotnet ef database update --project .\PaymentService
 dotnet ef database update --project .\TransportManagement
+dotnet ef database update --project .\EventService\
 
 echo "Done!"

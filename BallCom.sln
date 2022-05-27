@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallCore", "BallCore\BallCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService", "PaymentService\PaymentService.csproj", "{805F85F5-B14B-4FA7-AB2A-04A140AB40F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventService", "EventService\EventService.csproj", "{8C5C04F7-A968-4900-AF63-C80B07987591}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +68,9 @@ Global
 		{805F85F5-B14B-4FA7-AB2A-04A140AB40F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{805F85F5-B14B-4FA7-AB2A-04A140AB40F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{805F85F5-B14B-4FA7-AB2A-04A140AB40F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C5C04F7-A968-4900-AF63-C80B07987591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5C04F7-A968-4900-AF63-C80B07987591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5C04F7-A968-4900-AF63-C80B07987591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C5C04F7-A968-4900-AF63-C80B07987591}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
