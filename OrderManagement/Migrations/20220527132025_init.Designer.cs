@@ -11,7 +11,7 @@ using OrderManagement.DataAccess;
 namespace OrderManagement.Migrations
 {
     [DbContext(typeof(OrderManagementDbContext))]
-    [Migration("20220527101316_init")]
+    [Migration("20220527132025_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -52,9 +52,8 @@ namespace PaymentService.Migrations
                 {
                     InvoiceId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    InvoiceNumber = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    Orderid = table.Column<int>(type: "int", nullable: false)
+                    OrderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,8 +65,8 @@ namespace PaymentService.Migrations
                         principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Invoices_Orders_Orderid",
-                        column: x => x.Orderid,
+                        name: "FK_Invoices_Orders_OrderId",
+                        column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Cascade);
@@ -80,9 +79,9 @@ namespace PaymentService.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoices_Orderid",
+                name: "IX_Invoices_OrderId",
                 table: "Invoices",
-                column: "Orderid");
+                column: "OrderId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

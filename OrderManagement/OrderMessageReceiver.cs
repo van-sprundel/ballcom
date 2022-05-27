@@ -1,5 +1,6 @@
 ﻿using BallCore.Events;
 using BallCore.RabbitMq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OrderManagement.Controllers;
 using OrderManagement.DataAccess;
@@ -36,7 +37,11 @@ public class OrderMessageReceiver : MessageReceiver
                     {
                         // Update het order.
                         var existingOrder = _dbContext.Orders.FirstOrDefault(o => o.OrderId == c.OrderId);
+
+                        if (existingOrder == null) return Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
+                        
                         existingOrder.StatusProcess = c.StatusProcess ?? existingOrder.StatusProcess;
+                        existingOrder.IsPaid = c.IsPaid;
 
                         _dbContext.Orders.Update(existingOrder);
                         _dbContext.SaveChanges();

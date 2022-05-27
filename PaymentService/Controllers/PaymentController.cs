@@ -60,9 +60,22 @@ public class PaymentController : Controller
         var customer = await _dbContext.Customers.FindAsync(customerId);
 
         if (customer == null) return await Task.FromResult(new NotFoundObjectResult("Couldn't find order"));
-        
-        
 
-        return await Task.FromResult(Ok("test"));
+        var invoices = _dbContext.Invoices.Where(i => i.CustomerId == customerId);
+
+        return await Task.FromResult(Ok(invoices));
+    }
+    
+    [HttpGet]
+    [Route("{customerId}/not-paid")]
+    public async Task<IActionResult> GetOrdersToPay(int customerId)
+    {
+        var customer = await _dbContext.Customers.FindAsync(customerId);
+
+        if (customer == null) return await Task.FromResult(new NotFoundObjectResult("Couldn't find customer"));
+
+        var invoices = _dbContext.Invoices.Where(i => i.CustomerId == customerId && !i.Order.IsPaid);
+
+        return await Task.FromResult(Ok(invoices));
     }
 }
