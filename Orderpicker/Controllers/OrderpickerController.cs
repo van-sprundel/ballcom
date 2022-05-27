@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Orderpicker.DataAccess;
 using Orderpicker.Models;
+using BallCore.Enums;
 
 namespace Orderpicker.Controllers;
 
@@ -9,10 +10,12 @@ namespace Orderpicker.Controllers;
 public class OrderpickerController : Controller
 {
     private readonly OrderpickerDbContext _dbContext;
+    private readonly IMessageSender _messageSender;
 
     public OrderpickerController(OrderpickerDbContext dbContext)
     {
         _dbContext = dbContext;
+        _messageSender = messageSender;
     }
 
     [HttpGet]
@@ -63,7 +66,7 @@ public class OrderpickerController : Controller
 
         order.Status = form.Status;
 
-        _dbContext.Set<Order>().Update(order);
+        this._dbContext.Set<Order>().Update(order);
 
         return Ok();
     }
