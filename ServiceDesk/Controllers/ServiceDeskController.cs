@@ -166,7 +166,7 @@ public class ServiceDeskController : Controller
                 if (!contains) return BadRequest();
                 
                 var ticket = new Ticket
-                {
+                {   
                     TicketText = form.TicketText,
                     CustomerId = form.CustomerId,
                     Status = TicketStatus.Open

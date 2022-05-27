@@ -24,6 +24,7 @@ Remove-Item -path "PaymentService/Migrations/*" -r
 Remove-Item -path "ServiceDesk/Migrations/*" -r
 Remove-Item -path "SupplierManagement/Migrations/*" -r
 Remove-Item -path "TransportManagement/Migrations/*" -r
+Remove-Item -path "EventService/Migrations/*" -r
 
 dotnet ef migrations add "init" --project .\CustomerManagement\
 dotnet ef migrations add "init" --project .\ServiceDesk\
@@ -34,6 +35,7 @@ dotnet ef migrations add "init" --project .\Orderpicker\
 dotnet ef migrations add "init" --project .\OrderManagement\ #--verbose
 dotnet ef migrations add "init" --project .\PaymentService\
 dotnet ef migrations add "init" --project .\TransportManagement\
+dotnet ef migrations add "init" --project .\EventService\
 
 #.\update-database-all.ps1
 docker-compose down
