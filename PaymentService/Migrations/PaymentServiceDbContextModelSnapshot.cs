@@ -50,17 +50,14 @@ namespace PaymentService.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("InvoiceNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Orderid")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.HasKey("InvoiceId");
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("Orderid");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Invoices");
                 });
@@ -92,7 +89,7 @@ namespace PaymentService.Migrations
 
                     b.HasOne("PaymentService.Models.Order", "Order")
                         .WithMany()
-                        .HasForeignKey("Orderid")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

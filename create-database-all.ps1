@@ -5,6 +5,7 @@ echo "Creating databases"
 
 docker volume rm rabbitmqdata
 docker volume rm mariadbdata
+docker system prune -a
 
 docker volume create mariadbdata
 docker volume create rabbitmqdata
