@@ -11,6 +11,7 @@ var connStr = builder.Configuration.GetConnectionString("MariaDbConnectionString
 builder.Services.AddDbContext<EventContext>(options =>
     options.UseMySql(connStr, ServerVersion.AutoDetect(connStr)));
 
+#if DEBUG
 var connection = new ConnectionFactory
 {
     HostName = "rabbitmq",
@@ -22,6 +23,7 @@ var connection = new ConnectionFactory
 
 builder.Services.AddHostedService<EventsReceiver>();
 builder.Services.AddSingleton(connection);
+#endif
 
 var app = builder.Build();
 

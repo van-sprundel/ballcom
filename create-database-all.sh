@@ -1,4 +1,6 @@
-﻿echo "Killing containers..."
+﻿#!/bin/bash
+
+echo "Killing containers..."
 docker-compose down
 
 echo "Creating databases"
@@ -9,27 +11,32 @@ docker volume rm mariadbdata
 docker volume create mariadbdata
 docker volume create rabbitmqdata
 
+echo "Starting mariadb"
+docker-compose up rabbitmq mariadb -d
+
+sleep 5
+
 echo "Creating migrations"
 
-Start-Sleep -Seconds 5
+rm -r CustomerManagement/Migrations
+rm -r InventoryManagement/Migrations
+rm -r NotificationService/Migrations
+rm -r OrderManagement/Migrations
+rm -r OrderPicker/Migrations
+rm -r PaymentService/Migrations
+rm -r ServiceDesk/Migrations
+rm -r SupplierManagement/Migrations
+rm -r TransportManagement/Migrations
+rm -r EventService/Migrations
 
-Remove-Item -path "CustomerManagement/Migrations/*" -r
-Remove-Item -path "InventoyManagement/Migrations/*" -r 
-Remove-Item -path "NotifcationService/Migrations/*" -r
-Remove-Item -path "OrderManagement/Migrations/*" -r
-Remove-Item -path "OrderPicker/Migrations/*" -r
-Remove-Item -path "PaymentService/Migrations/*" -r
-Remove-Item -path "ServiceDesk/Migrations/*" -r
-Remove-Item -path "SupplierManagement/Migrations/*" -r
-Remove-Item -path "TransportManagement/Migrations/*" -r
+declare -a arr=("CustomerManagement" "SupplierManagement" "ServiceDesk" "InventoryManagement" "Orderpicker" "OrderManagement" "PaymentService" "TransportManagement")
 
-dotnet ef migrations add "init" --project .\CustomerManagement\ &&
-dotnet ef migrations add "init" --project .\ServiceDesk\ &&
-dotnet ef migrations add "init" --project .\SupplierManagement\ &&
-dotnet ef migrations add "init" --project .\InventoryManagement\ &&
-dotnet ef migrations add "init" --project .\Orderpicker\ &&
-dotnet ef migrations add "init" --project .\OrderManagement\ &&
-dotnet ef migrations add "init" --project .\PaymentService\ &&
-dotnet ef migrations add "init" --project .\TransportManagement\ 
+for i in "${arr[@]}"
+do
+   cd "$i"
+   dotnet ef migrations add "init"
+   dotnet ef database update
+   cd ..
+done
 
 echo "Done!"
