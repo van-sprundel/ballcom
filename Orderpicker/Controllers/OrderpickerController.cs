@@ -4,6 +4,7 @@ using Orderpicker.DataAccess;
 using Orderpicker.Models;
 using BallCore.Enums;
 using BallCore.Events;
+using BallCore.RabbitMq;
 
 namespace Orderpicker.Controllers;
 
@@ -11,7 +12,7 @@ namespace Orderpicker.Controllers;
 public class OrderpickerController : Controller
 {
     private readonly OrderpickerDbContext _dbContext;
-    private readonly IMessageSender _messageSender);
+    private readonly IMessageSender _messageSender;
 
     public OrderpickerController(OrderpickerDbContext dbContext, IMessageSender messageSender)
     {
@@ -102,6 +103,16 @@ public class OrderpickerController : Controller
         orderProduct.isPicked = true;
 
         this._dbContext.Set<OrderProduct>().Update(orderProduct);
+
+        // Send update to inventory management
+        var product = await this._dbContext.Set<Product>().FirstAsync(x => x.Id == orderProduct.Id);
+
+        if (product == null)
+        {
+            return this.NotFound();
+        }
+
+        this._messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_management", false));
 
         return this.Ok();
     }
