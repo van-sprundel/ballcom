@@ -29,7 +29,7 @@ if (!isDevelopment)
 //Inject ExchangeDeclarator
     var exchanges = new Dictionary<string, IEnumerable<string>>
     {
-        { "supplier_exchange", new[] { "inventory_management", "general" } }
+        { "supplier_exchange", new[] { "inventory_management","order_management", "general" } }
     };
 
     builder.Services.AddHostedService(_ => new ExchangeDeclarator(connection, exchanges));

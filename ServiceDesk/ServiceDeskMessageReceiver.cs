@@ -26,7 +26,7 @@ public class ServiceDeskMessageReceiver : MessageReceiver
                 {
                     Console.WriteLine(
                         $"Received ex: {de.UseExchange} {de.Type} message ({de.Name}) from {de.Destination} : {c.Email}");
-                    if (de.Type == EventType.Updated)
+                    if (de.Type == EventType.Created)
                     {
                         var customer = new Customer()
                         {
@@ -35,6 +35,17 @@ public class ServiceDeskMessageReceiver : MessageReceiver
                             LastName = c.LastName
                         };
                         _dbContext.Customers.Add(customer);
+                        _dbContext.SaveChanges();
+                    }
+                    if (de.Type == EventType.Updated)
+                    {
+                        var customer = new Customer()
+                        {
+                            Email = c.Email,
+                            CustomerId = c.CustomerId,
+                            LastName = c.LastName
+                        };
+                        _dbContext.Customers.Update(customer);
                         _dbContext.SaveChanges();
                     }
 

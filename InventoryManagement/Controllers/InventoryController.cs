@@ -71,10 +71,9 @@ public class InventoryController : Controller
 
         await _dbContext.SaveChangesAsync();
 
-        //TODO: send event
         _messageSender.Send(new DomainEvent(product, EventType.Updated, "inventory_exchange", true));
 
         // return result
-        return CreatedAtRoute("GetByProductId", new { customerId = product.ProductId }, product);
+        return StatusCode(204, product);
     }
 }
