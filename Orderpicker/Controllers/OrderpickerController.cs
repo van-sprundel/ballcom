@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Orderpicker.DataAccess;
 using Orderpicker.Models;
 using BallCore.Enums;
+using BallCore.Events;
 
 namespace Orderpicker.Controllers;
 
@@ -10,10 +11,12 @@ namespace Orderpicker.Controllers;
 public class OrderpickerController : Controller
 {
     private readonly OrderpickerDbContext _dbContext;
+    private readonly IMessageSender _messageSender);
 
-    public OrderpickerController(OrderpickerDbContext dbContext)
+    public OrderpickerController(OrderpickerDbContext dbContext, IMessageSender messageSender)
     {
         _dbContext = dbContext;
+        _messageSender = messageSender;
     }
 
     [HttpGet]
@@ -64,7 +67,9 @@ public class OrderpickerController : Controller
     [Route("update")]
     public async Task<IActionResult> UpdateStatus(OrderUpdateform form)
     {
-        var order = await this._dbContext.Set<Order>().FirstOrDefaultAsync(x => x.Id == form.Id);
+        var order = await this._dbContext
+            .Set<Order>()
+            .FirstOrDefaultAsync(x => x.Id == form.Id);
 
         if (order == null)
         {
@@ -73,7 +78,12 @@ public class OrderpickerController : Controller
 
         order.Status = form.Status;
 
-        this._dbContext.Set<Order>().Update(order);
+        this._dbContext
+            .Set<Order>()
+            .Update(order);
+
+        // Send update to order management
+        this._messageSender.Send(new DomainEvent(order, EventType.Updated, "order_management", false));
 
         return this.Ok();
     }
